@@ -57,7 +57,7 @@ dependencies:
 
 Represents the state of data flow:
 
-- `DataInitial` — no data yet
+- `DataInitial` — no data yet **or after a flush/reset**
 - `DataLoading` — loading in progress
 - `DataSuccess` — data successfully loaded
 - `DataError` — an error occurred
