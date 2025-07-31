@@ -1,0 +1,10 @@
+include: package:very_good_analysis/analysis_options.yaml
+
+linter:
+  rules:
+    prefer_const_constructors: true
+    prefer_const_declarations: true
+    prefer_const_literals_to_create_immutables: true
+    prefer_single_quotes: true
+    avoid_dynamic_calls: true
+    one_member_abstracts: false

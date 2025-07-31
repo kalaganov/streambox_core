@@ -1,0 +1,18 @@
+name: streambox_core
+description: Core for stream-based caching and data strategy architecture.
+version: 1.0.0
+homepage: https://github.com/yourname/streambox_core
+
+environment:
+  sdk: '>=3.7.0 <4.0.0'
+
+dependencies:
+  flutter_secure_storage: ^9.2.4 # https://pub.dev/packages/flutter_secure_storage
+  meta: ^1.16.0 # https://pub.dev/packages/meta
+  shared_preferences: ^2.5.3 # https://pub.dev/packages/shared_preferences
+
+
+dev_dependencies:
+  async: ^2.13.0
+  test: ^1.26.2 #https://pub.dev/packages/test
+  very_good_analysis: ^9.0.0 # https://pub.dev/packages/very_good_analysis
