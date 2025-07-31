@@ -1,6 +1,11 @@
 <!-- Logo -->
 
-<img src="https://raw.githubusercontent.com/kalaganov/streambox_core/main/assets/streambox_logo.webp" width="200" alt="streambox logo"/>
+<img
+src="https://raw.githubusercontent.com/kalaganov/streambox_core/main/assets/streambox_logo.webp"
+width="200"
+alt="streambox logo"
+style="border-radius: 24px;"
+/>
 
 # streambox_core
 
