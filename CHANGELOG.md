@@ -1,3 +1,13 @@
+## 1.1.0
+
+- Added new storage adapters exports:
+  - AsyncSharedPrefsStorageAdapter
+  - CachedSharedPrefsStorageAdapter
+  - FlutterSecureStorageAdapter
+  - MemoryStoreAdapter
+- Added example usage in `example/main.dart` demonstrating repository, caching, and DI setup.
+- Updated documentation to clarify `DataInitial` behavior after flush/reset.
+
 ## 1.0.0
 
 - Initial release of `streambox_core`.
