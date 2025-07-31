@@ -1,0 +1,61 @@
+name: test
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    name: Build & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.32.8"
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Run tests with coverage
+        run: dart test --coverage=coverage
+
+      - name: Check package config exists
+        run: ls -l .dart_tool/package_config.json
+
+      - name: List coverage dir
+        run: ls -R coverage || echo "No coverage dir"
+
+      - name: Activate coverage tool
+        run: dart pub global activate coverage
+
+      - name: Format coverage (force lcov)
+        run: |
+          dart pub global run coverage:format_coverage \
+            --lcov \
+            --in=coverage \
+            --out=coverage/lcov.info \
+            --report-on=lib/src \
+            --packages=.dart_tool/package_config.json
+          echo "--- formatted output ---"
+          head -n 10 coverage/lcov.info || echo "NO LCOV"
+
+      - name: Inspect lcov paths
+        run: |
+          echo "--- SF lines ---"
+          grep "^SF:" coverage/lcov.info || echo "NO SF FOUND"
+
+      - name: Fix paths in lcov.info
+        run: sed -i.bak 's|SF:.*/||g' coverage/lcov.info
+
+      - name: Upload to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: coverage/lcov.info
+          flags: default
+          name: default
