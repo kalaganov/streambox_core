@@ -1,3 +1,7 @@
+export 'src/adapters/async_shared_prefs_storage_adapter.dart';
+export 'src/adapters/cached_shared_prefs_storage_adapter.dart';
+export 'src/adapters/flutter_secure_storage_adapter.dart';
+export 'src/adapters/memory_store_adapter.dart';
 export 'src/cache/cache_interface.dart';
 export 'src/cache/key_value_cache.dart';
 export 'src/cache/key_value_store_interface.dart';
