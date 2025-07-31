@@ -1,8 +1,18 @@
+<!-- Logo -->
+
+<img src="https://raw.githubusercontent.com/kalaganov/streambox_core/main/assets/streambox_logo.webp" width="200" alt="streambox logo"/>
+
 # streambox_core
 
 A lightweight and extensible caching and repository framework for Dart & Flutter.\
 `streambox_core` helps you manage **data fetching**, **caching**, and **reactive streams**\
 with clean abstractions and powerful strategies.
+
+[![Build Status](https://img.shields.io/badge/build-success-brightgreen)]()
+[![pub package](https://img.shields.io/pub/v/streambox_core.svg)](https://pub.dev/packages/streambox_core)
+[![codecov](https://codecov.io/gh/kalaganov/streambox_core/branch/main/graph/badge.svg?flag=streambox_core)](https://codecov.io/gh/kalaganov/streambox_core/tree/main/packages/streambox_core)
+[![style: very good analysis](https://img.shields.io/badge/style-very_good_analysis-B22C89.svg)](https://pub.dev/packages/very_good_analysis)
+[![Verified Publisher](https://img.shields.io/pub/publisher/streambox_core)](https://pub.dev/packages/streambox_core)
 
 ---
 
