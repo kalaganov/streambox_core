@@ -1,3 +1,10 @@
+## 1.2.0
+
+- Moved all storage adapters into a separate package
+  [`streambox_adapters`](https://pub.dev/packages/streambox_adapters).
+- Updated documentation to reference the new package.
+- Core library is now lighter with no direct dependency on storage backends.
+
 ## 1.1.0
 
 - Added new storage adapters exports:
@@ -13,16 +20,16 @@
 - Initial release of `streambox_core`.
 - Implemented core repository and caching framework.
 - Added built-in cache strategies:
-    - CacheFirstStrategy
-    - CacheThenRefreshStrategy
-    - NoOpCacheStrategy
+  - CacheFirstStrategy
+  - CacheThenRefreshStrategy
+  - NoOpCacheStrategy
 - Provided base repository implementations:
-    - SingleSourceRepo
-    - ChainedSourcesRepo
-    - PeriodicRepo
+  - SingleSourceRepo
+  - ChainedSourcesRepo
+  - PeriodicRepo
 - Introduced DataState lifecycle: Initial, Loading, Success, Error.
 - Added ready-to-use storage adapters:
-    - MemoryStoreAdapter
-    - AsyncSharedPrefsStorageAdapter
-    - CachedPrefsAdapter
-    - FlutterSecureStorageAdapter
+  - MemoryStoreAdapter
+  - AsyncSharedPrefsStorageAdapter
+  - CachedPrefsAdapter
+  - FlutterSecureStorageAdapter

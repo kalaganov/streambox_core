@@ -46,7 +46,8 @@ Add to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  streambox_core: ^1.0.0
+  streambox_core: ^latest_version
+  streambox_adapters: ^latest_version
 ```
 
 ---
@@ -85,31 +86,16 @@ Repositories optionally support:
 
 ## 🗄️ Storage Adapters
 
-`streambox_core` provides several ready-to-use implementations of `KeyValueStoreInterface`, allowing you to plug in different storage backends depending on your requirements.
+Starting from version **1.2.0**, storage adapters were moved into a separate 
+package [`streambox_adapters`](https://pub.dev/packages/streambox_adapters).  
+This keeps `streambox_core` lightweight and lets adapters evolve independently.
 
-### MemoryStoreAdapter
+### Available adapters in `streambox_adapters`
 
-- **Description**: Stores values in memory only.
-- **Use cases**: Testing, prototyping, ephemeral caches.
-- **Persistence**: ❌ (cleared when app restarts).
-
-### AsyncSharedPrefsStorageAdapter
-
-- **Description**: Uses the asynchronous `SharedPreferencesAsync` API.
-- **Use cases**: General persistent storage where async access is acceptable.
-- **Persistence**: ✅ (backed by shared preferences).
-
-### CachedPrefsAdapter
-
-- **Description**: Backed by `SharedPreferencesWithCache`, minimizing disk I/O with an in-memory cache.
-- **Use cases**: Persistent storage with improved performance by caching reads.
-- **Persistence**: ✅ (cached + disk-backed).
-
-### FlutterSecureStorageAdapter
-
-- **Description**: Backed by `flutter_secure_storage` for encrypted key-value storage.
-- **Use cases**: Securely storing sensitive data such as tokens, credentials, or secrets.
-- **Persistence**: ✅ (secure and encrypted).
+- **MemoryStoreAdapter** — in-memory only, ideal for tests and prototyping
+- **AsyncSharedPrefsStorageAdapter** — backed by SharedPreferencesAsync
+- **CachedSharedPrefsStorageAdapter** — SharedPreferences with in-memory caching
+- **FlutterSecureStorageAdapter** — secure encrypted storage
 
 ---
 
@@ -211,4 +197,3 @@ You can implement:
 - Custom storage adapters
 
 ---
-
