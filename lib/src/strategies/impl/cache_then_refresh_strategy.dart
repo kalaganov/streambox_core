@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:streambox_core/src/common/request_params.dart';
 import 'package:streambox_core/src/common/typedefs.dart';
 import 'package:streambox_core/src/strategies/base/base_cache_strategy.dart';
 
@@ -19,9 +20,10 @@ import 'package:streambox_core/src/strategies/base/base_cache_strategy.dart';
 /// consumers receive the most recent data once it becomes available.
 ///
 /// Type Parameters:
-/// - [P] – Type of request parameters.
+/// - [P] – Request parameters extending [RequestParams].
 /// - [R] – Type of cached or fetched value.
-abstract class CacheThenRefreshStrategy<P, R> extends BaseCacheStrategy<P, R> {
+final class CacheThenRefreshStrategy<P extends RequestParams, R>
+    extends BaseCacheStrategy<P, R> {
   /// Creates a [CacheThenRefreshStrategy] with the given [cache].
   CacheThenRefreshStrategy({required super.cache});
 

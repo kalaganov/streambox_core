@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:streambox_core/src/common/controller_extension.dart';
+import 'package:streambox_core/src/common/request_params.dart';
 import 'package:streambox_core/src/common/request_payload.dart';
 import 'package:streambox_core/src/common/typedefs.dart';
 import 'package:streambox_core/src/strategies/base/cache_strategy_interface.dart';
@@ -13,12 +14,12 @@ import 'package:streambox_core/src/strategies/base/cache_strategy_interface.dart
 /// - On success: emits a [RequestSuccess] payload.
 /// - On error: emits a [RequestError] payload.
 /// - On [flush]: emits a [RequestInitial] payload.
-/// - [resolveKey] is not supported and will throw [UnimplementedError].
 ///
 /// Type Parameters:
-/// - [P] – Type of request parameters.
+/// - [P] – Request parameters extending [RequestParams].
 /// - [R] – Type of request value.
-final class NoOpCacheStrategy<P, R> implements CacheStrategy<P, R> {
+final class NoOpCacheStrategy<P extends RequestParams, R>
+    implements CacheStrategy<P, R> {
   final _controller = StreamController<RequestPayload<P, R>>.broadcast();
 
   /// A broadcast stream of request payloads representing
@@ -46,10 +47,6 @@ final class NoOpCacheStrategy<P, R> implements CacheStrategy<P, R> {
       );
     }
   }
-
-  /// Not supported. Always throws [UnimplementedError].
-  @override
-  String resolveKey(P? params) => throw UnimplementedError();
 
   /// Emits an initial state to reset the stream.
   @override

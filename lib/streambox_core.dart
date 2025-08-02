@@ -1,7 +1,9 @@
 export 'src/cache/cache_interface.dart';
 export 'src/cache/key_value_cache.dart';
 export 'src/cache/key_value_store_interface.dart';
+export 'src/common/const.dart';
 export 'src/common/data_state.dart';
+export 'src/common/request_params.dart';
 export 'src/common/request_payload.dart';
 export 'src/common/request_version.dart';
 export 'src/common/typedefs.dart';

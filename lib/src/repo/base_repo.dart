@@ -6,6 +6,7 @@ import 'package:streambox_core/src/common/adapter/behavior_stream_adapter.dart';
 import 'package:streambox_core/src/common/adapter/broadcast_stream_adapter.dart';
 import 'package:streambox_core/src/common/adapter/stream_adapter.dart';
 import 'package:streambox_core/src/common/data_state.dart';
+import 'package:streambox_core/src/common/request_params.dart';
 import 'package:streambox_core/src/repo/repo_interface.dart';
 
 /// A base implementation of the [Repo] interface.
@@ -15,10 +16,10 @@ import 'package:streambox_core/src/repo/repo_interface.dart';
 /// events. Subclasses are expected to implement the [fetch] method.
 ///
 /// Type Parameters:
-/// - [P] – Type of request parameters.
+/// - [P] – Request parameters extending [RequestParams].
 /// - [E] – Type of data entity.
 @immutable
-abstract class BaseRepo<P, E> implements Repo<P, E> {
+abstract class BaseRepo<P extends RequestParams, E> implements Repo<P, E> {
   /// Creates a new [BaseRepo].
   ///
   /// - [initialFetchParams]: parameters to pass for the first fetch.
@@ -30,10 +31,9 @@ abstract class BaseRepo<P, E> implements Repo<P, E> {
     bool fetchOnInit = false,
     bool replayLast = false,
   }) {
-    _streamAdapter =
-        replayLast
-            ? BehaviorStreamAdapter<DataState<E>>()
-            : BroadcastStreamAdapter<DataState<E>>();
+    _streamAdapter = replayLast
+        ? BehaviorStreamAdapter<DataState<E>>()
+        : BroadcastStreamAdapter<DataState<E>>();
 
     if (fetchOnInit) fetch(initialFetchParams);
   }

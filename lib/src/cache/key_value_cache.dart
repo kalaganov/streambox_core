@@ -41,6 +41,7 @@ abstract class BaseKeyValueCache<R> implements Cache<R> {
   /// Typically used as a helper for [serialize].
   @protected
   @nonVirtual
+  @visibleForTesting
   String encode(Object object) => jsonEncode(object);
 
   /// Decodes a JSON string into a [Map<String, dynamic>].
@@ -50,13 +51,6 @@ abstract class BaseKeyValueCache<R> implements Cache<R> {
   @nonVirtual
   Map<String, dynamic> decodeAsMap(String source) =>
       jsonDecode(source) as Map<String, dynamic>;
-
-  /// Decodes a JSON string into a list of values of type [R].
-  ///
-  /// Useful when storing multiple values in an array-like format.
-  @protected
-  @nonVirtual
-  List<R> decodeAsList(String source) => (jsonDecode(source) as List).cast<R>();
 
   /// Retrieves the cached value for the given [key].
   ///

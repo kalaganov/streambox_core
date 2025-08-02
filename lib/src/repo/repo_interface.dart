@@ -1,4 +1,5 @@
 import 'package:streambox_core/src/common/data_state.dart';
+import 'package:streambox_core/src/common/request_params.dart';
 
 /// A generic repository interface for managing data fetching,
 /// state streaming, and lifecycle control.
@@ -7,9 +8,9 @@ import 'package:streambox_core/src/common/data_state.dart';
 /// data entities, while exposing their states through a stream.
 ///
 /// Type Parameters:
-/// - [P] – Type of request parameters.
+/// - [P] – Request parameters extending [RequestParams].
 /// - [E] – Type of data entity returned.
-abstract interface class Repo<P, E> {
+abstract interface class Repo<P extends RequestParams, E> {
   /// Initiates a data fetch with optional [p] parameters.
   ///
   /// Implementations should push resulting states to the [stream].

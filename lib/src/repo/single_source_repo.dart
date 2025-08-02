@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:meta/meta.dart';
 import 'package:streambox_core/src/common/payload_handler_delegate.dart';
+import 'package:streambox_core/src/common/request_params.dart';
 import 'package:streambox_core/src/common/request_payload.dart';
 import 'package:streambox_core/src/data_sources/data_source_interface.dart';
 import 'package:streambox_core/src/repo/base_repo.dart';
@@ -13,11 +14,12 @@ import 'package:streambox_core/src/repo/base_repo.dart';
 /// from the data source into entities of type [E].
 ///
 /// Type Parameters:
-/// - [P] – Type of request parameters.
+/// - [P] – Request parameters extending [RequestParams].
 /// - [R] – Type of values returned by the data source.
 /// - [E] – Type of mapped entity exposed by the repository.
 @immutable
-abstract class SingleSourceRepo<P, R, E> extends BaseRepo<P, E> {
+abstract class SingleSourceRepo<P extends RequestParams, R, E>
+    extends BaseRepo<P, E> {
   /// Creates a [SingleSourceRepo] with the given [dataSource].
   ///
   /// - [initialFetchParams]: parameters for the first fetch,

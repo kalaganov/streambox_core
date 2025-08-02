@@ -1,3 +1,4 @@
+import 'package:streambox_core/src/common/request_params.dart';
 import 'package:streambox_core/src/common/request_payload.dart';
 
 /// A generic data source interface for executing requests,
@@ -7,9 +8,9 @@ import 'package:streambox_core/src/common/request_payload.dart';
 /// emit request payloads, and support flushing and disposal.
 ///
 /// Type Parameters:
-/// - [P] – Type of request parameters.
+/// - [P] – Request parameters extending [RequestParams].
 /// - [R] – Type of request result value.
-abstract interface class DataSource<P, R> {
+abstract interface class DataSource<P extends RequestParams, R> {
   /// Initiates a data fetch with optional [params] and [extras].
   ///
   /// Implementations should push resulting payloads to the [stream].

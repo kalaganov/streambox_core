@@ -2,7 +2,9 @@ import 'dart:async';
 
 import 'package:meta/meta.dart';
 import 'package:streambox_core/src/cache/cache_interface.dart';
+import 'package:streambox_core/src/common/const.dart';
 import 'package:streambox_core/src/common/controller_extension.dart';
+import 'package:streambox_core/src/common/request_params.dart';
 import 'package:streambox_core/src/common/request_payload.dart';
 import 'package:streambox_core/src/common/request_version.dart';
 import 'package:streambox_core/src/common/typedefs.dart';
@@ -16,10 +18,11 @@ import 'package:streambox_core/src/strategies/base/cache_strategy_interface.dart
 /// data is fetched and cached.
 ///
 /// Type Parameters:
-/// - [P] – Type of the request parameters.
+/// - [P] – Request parameters extending [RequestParams].
 /// - [R] – Type of the cached value.
 @immutable
-abstract class BaseCacheStrategy<P, R> implements CacheStrategy<P, R> {
+abstract class BaseCacheStrategy<P extends RequestParams, R>
+    implements CacheStrategy<P, R> {
   /// Creates a cache strategy with the given [cache].
   ///
   /// The [cache] provides the persistence mechanism for storing values.
@@ -36,6 +39,14 @@ abstract class BaseCacheStrategy<P, R> implements CacheStrategy<P, R> {
   @override
   @nonVirtual
   Stream<RequestPayload<P, R>> get stream => _controller.stream;
+
+  /// Resolves a cache key for the given [params].
+  ///
+  /// Defaults to `params.cacheKey` if provided, otherwise uses
+  /// [kDefaultCacheKey].
+  @protected
+  @nonVirtual
+  String resolveKey(P? params) => params?.cacheKey ?? kDefaultCacheKey;
 
   /// Clears all cached values and resets the request version.
   ///

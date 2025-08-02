@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:meta/meta.dart';
+import 'package:streambox_core/src/common/request_params.dart';
 import 'package:streambox_core/src/common/request_payload.dart';
 import 'package:streambox_core/src/data_sources/data_source_interface.dart';
 import 'package:streambox_core/src/repo/base_repo.dart';
@@ -19,7 +20,14 @@ import 'package:streambox_core/src/repo/base_repo.dart';
 /// - [R2] – Type of value returned by the dependent source.
 /// - [E] – Type of the final mapped entity exposed by the repository.
 @immutable
-abstract class ChainedSourcesRepo<P1, P2, R1, R2, E> extends BaseRepo<P1, E> {
+abstract class ChainedSourcesRepo<
+  P1 extends RequestParams,
+  P2 extends RequestParams,
+  R1,
+  R2,
+  E
+>
+    extends BaseRepo<P1, E> {
   /// Creates a chained repository with the given [primarySource]
   /// and [dependentSource].
   ///

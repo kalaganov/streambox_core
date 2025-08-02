@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:streambox_core/src/common/request_params.dart';
 import 'package:streambox_core/src/common/typedefs.dart';
 import 'package:streambox_core/src/strategies/base/base_cache_strategy.dart';
 
@@ -15,9 +16,10 @@ import 'package:streambox_core/src/strategies/base/base_cache_strategy.dart';
 ///   to ensure outdated values are not emitted.
 ///
 /// Type Parameters:
-/// - [P] – Type of request parameters.
+/// - [P] – Request parameters extending [RequestParams].
 /// - [R] – Type of cached or fetched value.
-abstract class CacheFirstStrategy<P, R> extends BaseCacheStrategy<P, R> {
+final class CacheFirstStrategy<P extends RequestParams, R>
+    extends BaseCacheStrategy<P, R> {
   /// Creates a [CacheFirstStrategy] with the given [cache].
   CacheFirstStrategy({required super.cache});
 

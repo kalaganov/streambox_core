@@ -1,4 +1,5 @@
 import 'package:meta/meta.dart';
+import 'package:streambox_core/src/common/request_params.dart';
 
 /// Represents the base class for all request states.
 ///
@@ -6,27 +7,31 @@ import 'package:meta/meta.dart';
 /// such as initial, loading, success, or error.
 ///
 /// Type Parameters:
-/// - [P] – Type of request parameters.
-/// - [R] – Type of request value.
+/// - [P] – Request parameters extending [RequestParams].
+/// - [R] – Value type returned by the request.
 @immutable
-sealed class RequestPayload<P, R> {
+sealed class RequestPayload<P extends RequestParams, R> {
   /// Creates a new request payload with optional [params].
   const RequestPayload({
     required this.params,
   });
 
-  /// Parameters associated with the request, if any.
+  /// The parameters used for the request, if provided.
+  ///
+  /// Used for request identification and caching.
   final P? params;
 }
 
 /// Indicates the initial state before any request has been made.
-final class RequestInitial<P, R> extends RequestPayload<P, R> {
+final class RequestInitial<P extends RequestParams, R>
+    extends RequestPayload<P, R> {
   /// Creates an initial request state with optional [params].
   const RequestInitial({required super.params});
 }
 
 /// Indicates that a request is currently in progress.
-final class RequestLoading<P, R> extends RequestPayload<P, R> {
+final class RequestLoading<P extends RequestParams, R>
+    extends RequestPayload<P, R> {
   /// Creates a loading request state with optional [params].
   const RequestLoading({required super.params});
 }
@@ -34,7 +39,8 @@ final class RequestLoading<P, R> extends RequestPayload<P, R> {
 /// Indicates that a request has successfully completed.
 ///
 /// Contains the resulting [value] and optional [extras] metadata.
-final class RequestSuccess<P, R> extends RequestPayload<P, R> {
+final class RequestSuccess<P extends RequestParams, R>
+    extends RequestPayload<P, R> {
   /// Creates a success request state with the given [value].
   ///
   /// Optionally, [extras] may contain additional context or metadata.
@@ -54,7 +60,8 @@ final class RequestSuccess<P, R> extends RequestPayload<P, R> {
 /// Indicates that a request has failed.
 ///
 /// Contains the encountered [error] and optional [stackTrace].
-final class RequestError<P, R> extends RequestPayload<P, R> {
+final class RequestError<P extends RequestParams, R>
+    extends RequestPayload<P, R> {
   /// Creates an error request state with the given [error].
   ///
   /// Optionally, a [stackTrace] may provide more debugging details.

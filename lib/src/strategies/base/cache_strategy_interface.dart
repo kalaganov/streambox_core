@@ -1,4 +1,4 @@
-import 'package:meta/meta.dart';
+import 'package:streambox_core/src/common/request_params.dart';
 import 'package:streambox_core/src/common/request_payload.dart';
 import 'package:streambox_core/src/common/typedefs.dart';
 
@@ -9,21 +9,15 @@ import 'package:streambox_core/src/common/typedefs.dart';
 /// generating cache keys, executing requests, and managing lifecycle.
 ///
 /// Type Parameters:
-/// - [P] – Type of request parameters.
+/// - [P] – Request parameters extending [RequestParams].
 /// - [R] – Type of cached or fetched value.
-abstract interface class CacheStrategy<P, R> {
+abstract interface class CacheStrategy<P extends RequestParams, R> {
   /// Initiates a request with the given [params], optional [extras],
   /// and a [fetch] function for retrieving values.
   ///
   /// Implementations decide whether to return cached data or
   /// perform a new fetch.
   void request(P? params, List<Object>? extras, ValueFetcher<R> fetch);
-
-  /// Resolves a cache key for the given [params].
-  ///
-  /// Used to uniquely identify cached entries.
-  @protected
-  String resolveKey(P? params);
 
   /// Clears all cached data associated with this strategy.
   Future<void> flush();

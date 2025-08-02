@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:meta/meta.dart';
 import 'package:streambox_core/src/common/controller_extension.dart';
+import 'package:streambox_core/src/common/request_params.dart';
 import 'package:streambox_core/src/common/request_payload.dart';
 import 'package:streambox_core/src/data_sources/data_source_interface.dart';
 
@@ -15,10 +16,11 @@ import 'package:streambox_core/src/data_sources/data_source_interface.dart';
 /// are initiated.
 ///
 /// Type Parameters:
-/// - [P] – Type of request parameters.
+/// - [P] – Request parameters extending [RequestParams].
 /// - [R] – Type of streamed value.
 @immutable
-abstract class BaseExternalStreamDataSource<P, R> implements DataSource<P, R> {
+abstract class BaseExternalStreamDataSource<P extends RequestParams, R>
+    implements DataSource<P, R> {
   /// Creates a data source bound to the given [sourceStream].
   ///
   /// The [sourceStream] provides external values that will be mapped

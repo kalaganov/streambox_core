@@ -2,22 +2,28 @@ import 'dart:async';
 
 import 'package:meta/meta.dart';
 import 'package:streambox_core/src/common/controller_extension.dart';
+import 'package:streambox_core/src/common/request_params.dart';
 import 'package:streambox_core/src/common/request_payload.dart';
 import 'package:streambox_core/src/data_sources/data_source_interface.dart';
 import 'package:streambox_core/src/strategies/base/cache_strategy_interface.dart';
 
-/// A base implementation of the [DataSource] interface that uses a
-/// [CacheStrategy] to manage requests, caching, and state streaming.
+/// Base implementation of the [DataSource] interface that integrates
+/// with a [CacheStrategy] to manage fetching, caching, and streaming
+/// of request states.
 ///
-/// Subclasses must implement the [request] method to define how data
-/// is fetched. This class automatically handles request forwarding,
-/// stream broadcasting, and lifecycle management.
+/// Responsibilities:
+/// - Delegates request execution to a [CacheStrategy].
+/// - Emits [RequestPayload] states (initial, loading, success, error).
+/// - Manages lifecycle: initialization, flushing, and disposal.
+///
+/// Subclasses must implement [request] to define how data is fetched.
 ///
 /// Type Parameters:
-/// - [P] – Type of request parameters.
-/// - [R] – Type of request result value.
+/// - [P] – Request parameters extending [RequestParams].
+/// - [R] – Type of the request result.
 @immutable
-abstract class BaseDataSource<P, R> implements DataSource<P, R> {
+abstract class BaseDataSource<P extends RequestParams, R>
+    implements DataSource<P, R> {
   /// Creates a data source with the provided [cacheStrategy].
   ///
   /// The [cacheStrategy] defines how requests are handled, cached,
@@ -42,9 +48,12 @@ abstract class BaseDataSource<P, R> implements DataSource<P, R> {
 
   void _onData(RequestPayload<P, R> value) => _controller.safeAdd(value);
 
-  /// Initiates a fetch request with optional [params] and [extras].
+  /// Initiates a new request.
   ///
-  /// Delegates the request handling to the underlying [CacheStrategy].
+  /// - [params]: optional request parameters.
+  /// - [extras]: additional context for request execution.
+  ///
+  /// Forwards the request to the underlying [CacheStrategy].
   @override
   @nonVirtual
   void fetch([P? params, List<Object>? extras]) {

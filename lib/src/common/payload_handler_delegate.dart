@@ -1,3 +1,4 @@
+import 'package:streambox_core/src/common/request_params.dart';
 import 'package:streambox_core/src/common/request_payload.dart';
 
 /// A delegate that handles different [RequestPayload] states by
@@ -7,10 +8,10 @@ import 'package:streambox_core/src/common/request_payload.dart';
 /// to the data callback.
 ///
 /// Type Parameters:
-/// - [P] – Type of request parameters.
-/// - [R] – Type of request value.
-/// - [E] – Type of mapped data delivered to the data callback.
-class PayloadHandlerDelegate<P, R, E> {
+/// - [P] – Request parameters extending [RequestParams].
+/// - [R] – Original request value type.
+/// - [E] – Type of the mapped data delivered to the `onData` callback.
+class PayloadHandlerDelegate<P extends RequestParams, R, E> {
   /// Creates a new handler delegate with the given callbacks.
   ///
   /// - [map] transforms a successful `value` into a type [E].
@@ -36,8 +37,12 @@ class PayloadHandlerDelegate<P, R, E> {
   final void Function() _onLoading;
   final void Function() _onFlush;
 
-  /// Handles the given [payload] by dispatching it to the
-  /// appropriate callback.
+  /// Processes the given [RequestPayload] and dispatches it
+  /// to the appropriate callback:
+  /// - [RequestLoading] → [_onLoading]
+  /// - [RequestSuccess] → [_handleSuccess]
+  /// - [RequestInitial] → [_onFlush]
+  /// - [RequestError] → [_onError]
   void handle(RequestPayload<P, R> payload) => switch (payload) {
     RequestLoading<P, R>() => _onLoading(),
     RequestSuccess<P, R>(:final params, :final value) => _handleSuccess(
