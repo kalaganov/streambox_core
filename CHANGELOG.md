@@ -1,3 +1,11 @@
+## 1.3.0
+
+- Introduced `RequestParams` abstraction for strongly typed request parameters.
+- Unified APIs across `DataSource`, `Repo`, and `CacheStrategy` to require `RequestParams`.
+- Refactored `BaseCacheStrategy` to automatically resolve cache keys.
+- Simplified repository and data source generics for better type safety.
+- Updated all tests to cover new APIs and edge cases.
+
 ## 1.2.0
 
 - Moved all storage adapters into a separate package
