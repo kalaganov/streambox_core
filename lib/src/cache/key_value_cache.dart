@@ -17,9 +17,7 @@ abstract class BaseKeyValueCache<R> implements Cache<R> {
   /// Creates a new cache with the provided [store].
   ///
   /// The [store] defines the underlying persistence mechanism.
-  const BaseKeyValueCache({
-    required this.store,
-  });
+  const BaseKeyValueCache({required this.store});
 
   /// Underlying key-value store used for persistence.
   final KeyValueStoreInterface store;

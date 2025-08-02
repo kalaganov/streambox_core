@@ -12,9 +12,7 @@ import 'package:streambox_core/src/common/request_params.dart';
 @immutable
 sealed class RequestPayload<P extends RequestParams, R> {
   /// Creates a new request payload with optional [params].
-  const RequestPayload({
-    required this.params,
-  });
+  const RequestPayload({required this.params});
 
   /// The parameters used for the request, if provided.
   ///

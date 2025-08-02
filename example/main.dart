@@ -2,16 +2,6 @@
 ///
 /// ```dart
 /// // 📂 data layer
-/// class FetchParams implements RequestParams {
-///   FetchParams({required this.page, required this.size});
-///
-///   final int page;
-///   final int size;
-///
-///   @override
-///   String get cacheKey => 'cacheKey: $page-$size';
-/// }
-///
 /// // response from backend
 /// class ItemResponse {
 ///   // fromJson...
@@ -69,6 +59,16 @@
 /// }
 ///
 /// // 📂 domain layer
+/// class FetchParams implements RequestParams {
+///   FetchParams({required this.page, required this.size});
+///
+///   final int page;
+///   final int size;
+///
+///   @override
+///   String get cacheKey => 'cacheKey: $page-$size';
+/// }
+///
 /// class ExampleEntity {
 ///   //
 /// }

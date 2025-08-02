@@ -1,3 +1,7 @@
+## 1.3.1
+
+- fix README and example
+
 ## 1.3.0
 
 - Introduced `RequestParams` abstraction for strongly typed request parameters.

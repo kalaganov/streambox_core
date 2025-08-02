@@ -105,6 +105,11 @@ Below is an abstract example showing how to wire together a data source, a cache
 
 ```dart
 // 📂 data layer
+class ItemResponse {
+  // fromJson...
+  // toJson...
+}
+
 @RestApi()
 abstract interface class ExampleApiInterface {
   factory ExampleApiInterface(Dio dio) = _ExampleApiInterface;
@@ -116,8 +121,7 @@ abstract interface class ExampleApiInterface {
   });
 }
 
-final class ExampleDataSource
-    extends BaseDataSource<FetchParams, ItemResponse> {
+final class ExampleDataSource extends BaseDataSource<FetchParams, ItemResponse> {
   ExampleDataSource({
     required ExampleApiInterface api,
     required super.cacheStrategy,
@@ -130,14 +134,6 @@ final class ExampleDataSource
     assert(params != null);
     return _api.fetchItems(page: params!.page, size: params.size);
   }
-}
-
-final class ExampleCacheStrategy
-    extends CacheThenRefreshStrategy<FetchParams, ItemResponse> {
-  ExampleCacheStrategy({required super.cache});
-
-  @override
-  String resolveKey(FetchParams? params) => '${params?.page}-${params?.size}';
 }
 
 final class ExampleCache extends BaseKeyValueCache<ItemResponse> {
@@ -154,8 +150,7 @@ final class ExampleCache extends BaseKeyValueCache<ItemResponse> {
   String serialize(ItemResponse value) => encode(value.toJson());
 }
 
-final class ExampleRepoImpl
-    extends SingleSourceRepo<FetchParams, ItemResponse, ExampleEntity>
+final class ExampleRepoImpl extends SingleSourceRepo<FetchParams, ItemResponse, ExampleEntity>
     implements ExampleRepo {
   ExampleRepoImpl({required super.dataSource});
 
@@ -168,11 +163,21 @@ final class ExampleRepoImpl
 abstract interface class ExampleRepo
     implements Repo<FetchParams, ExampleEntity> {}
 
+class FetchParams implements RequestParams {
+  FetchParams({required this.page, required this.size});
+
+  final int page;
+  final int size;
+
+  @override
+  String get cacheKey => 'cacheKey: $page-$size';
+}
+
 // 📂 di module
 final exampleRepo = ExampleRepoImpl(
   dataSource: ExampleDataSource(
     api: ExampleApiInterface(dio),
-    cacheStrategy: ExampleCacheStrategy(
+    cacheStrategy: CacheThenRefreshStrategy(
       cache: ExampleCache(store: MemoryStoreAdapter()),
     ),
   ),
