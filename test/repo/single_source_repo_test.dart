@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:streambox_core/src/common/data_state.dart';
+import 'package:streambox_core/src/common/request_params.dart';
 import 'package:streambox_core/src/data_sources/base_data_source.dart';
 import 'package:streambox_core/src/data_sources/data_source_interface.dart';
 import 'package:streambox_core/src/repo/repo_interface.dart';
@@ -11,8 +12,8 @@ import 'package:test/test.dart';
 void main() {
   group('SingleSourceRepo', () {
     test('emits DataSuccess', () async {
-      late DataSource<String, _Response> source;
-      late Repo<String, String> repo;
+      late DataSource<_MockRequestParams, _Response> source;
+      late Repo<_MockRequestParams, String> repo;
 
       source = _MockDataSource();
       repo = _MockRepoImpl(dataSource: source);
@@ -20,7 +21,7 @@ void main() {
       final events = <DataState<String>>[];
       final sub = repo.stream.listen(events.add);
 
-      repo.fetch('a');
+      repo.fetch(const _MockRequestParams('a'));
       await Future<dynamic>.delayed(Duration.zero);
 
       expect(events.length, 1);
@@ -35,8 +36,8 @@ void main() {
     });
 
     test('emits DataSuccess initial fetch', () async {
-      late DataSource<String, _Response> source;
-      late Repo<String, String> repo;
+      late DataSource<_MockRequestParams, _Response> source;
+      late Repo<_MockRequestParams, String> repo;
 
       source = _MockDataSourceInitial();
       repo = _MockRepoInitial(dataSource: source);
@@ -44,7 +45,7 @@ void main() {
       final events = <DataState<String>>[];
       final sub = repo.stream.listen(events.add);
 
-      repo.fetch('success');
+      repo.fetch(const _MockRequestParams('success'));
       await Future<dynamic>.delayed(Duration.zero);
 
       expect(events.length, 2);
@@ -65,8 +66,8 @@ void main() {
     });
 
     test('emits DataSuccess initial fetch only', () async {
-      late DataSource<String, _Response> source;
-      late Repo<String, String> repo;
+      late DataSource<_MockRequestParams, _Response> source;
+      late Repo<_MockRequestParams, String> repo;
 
       source = _MockDataSourceInitial();
       repo = _MockRepoInitial(dataSource: source);
@@ -88,8 +89,8 @@ void main() {
     });
 
     test('emits DataError if mapper throws', () async {
-      late DataSource<String, _Response> source;
-      late Repo<String, String> repo;
+      late DataSource<_MockRequestParams, _Response> source;
+      late Repo<_MockRequestParams, String> repo;
 
       source = _MockDataSource();
       repo = _MockRepoFail(dataSource: source);
@@ -97,7 +98,7 @@ void main() {
       final events = <DataState<String>>[];
       final sub = repo.stream.listen(events.add);
 
-      repo.fetch('a');
+      repo.fetch(const _MockRequestParams('a'));
       await Future<dynamic>.delayed(Duration.zero);
 
       expect(events.length, 1);
@@ -110,8 +111,8 @@ void main() {
     });
 
     test('emits DataError if fetch throws', () async {
-      late DataSource<String, _Response> source;
-      late Repo<String, String> repo;
+      late DataSource<_MockRequestParams, _Response> source;
+      late Repo<_MockRequestParams, String> repo;
 
       source = _MockDataSourceFail();
       repo = _MockRepoImpl(dataSource: source);
@@ -119,7 +120,7 @@ void main() {
       final events = <DataState<String>>[];
       final sub = repo.stream.listen(events.add);
 
-      repo.fetch('a');
+      repo.fetch(const _MockRequestParams('a'));
       await Future<dynamic>.delayed(Duration.zero);
 
       expect(events.length, 1);
@@ -132,8 +133,8 @@ void main() {
     });
 
     test('emits DataInitial', () async {
-      late DataSource<String, _Response> source;
-      late Repo<String, String> repo;
+      late DataSource<_MockRequestParams, _Response> source;
+      late Repo<_MockRequestParams, String> repo;
 
       source = _MockDataSource();
       repo = _MockRepoImpl(dataSource: source);
@@ -152,8 +153,8 @@ void main() {
     });
 
     test('fetch after dispose does nothing', () async {
-      late DataSource<String, _Response> source;
-      late Repo<String, String> repo;
+      late DataSource<_MockRequestParams, _Response> source;
+      late Repo<_MockRequestParams, String> repo;
 
       source = _MockDataSource();
       repo = _MockRepoImpl(dataSource: source);
@@ -187,53 +188,74 @@ final class _MyException implements Exception {
   String toString() => '_MyException{}';
 }
 
-class _MockDataSource extends BaseDataSource<String, _Response> {
+class _MockDataSource extends BaseDataSource<_MockRequestParams, _Response> {
   _MockDataSource() : super(cacheStrategy: NoOpCacheStrategy());
 
   @override
-  Future<_Response> request(String? params) {
+  Future<_Response> request(_MockRequestParams? params) {
     return Future.value(const _Response('success'));
   }
 }
 
-class _MockDataSourceInitial extends BaseDataSource<String, _Response> {
+class _MockDataSourceInitial
+    extends BaseDataSource<_MockRequestParams, _Response> {
   _MockDataSourceInitial() : super(cacheStrategy: NoOpCacheStrategy());
 
   @override
-  Future<_Response> request(String? params) {
+  Future<_Response> request(_MockRequestParams? params) {
     return Future.value(_Response('response: $params'));
   }
 }
 
-class _MockDataSourceFail extends BaseDataSource<String, _Response> {
+class _MockDataSourceFail
+    extends BaseDataSource<_MockRequestParams, _Response> {
   _MockDataSourceFail() : super(cacheStrategy: NoOpCacheStrategy());
 
   @override
-  Future<_Response> request(String? params) {
+  Future<_Response> request(_MockRequestParams? params) {
     return throw _error;
   }
 }
 
-class _MockRepoImpl extends SingleSourceRepo<String, _Response, String> {
+class _MockRepoImpl
+    extends SingleSourceRepo<_MockRequestParams, _Response, String> {
   _MockRepoImpl({required super.dataSource});
 
   @override
-  String map(String? params, _Response value) => 'mapped value: ${value.value}';
+  String map(_MockRequestParams? params, _Response value) =>
+      'mapped value: ${value.value}';
 }
 
-class _MockRepoInitial extends SingleSourceRepo<String, _Response, String> {
+class _MockRepoInitial
+    extends SingleSourceRepo<_MockRequestParams, _Response, String> {
   _MockRepoInitial({required super.dataSource})
-    : super(initialFetchParams: 'initial params', fetchOnInit: true);
+    : super(initialFetchParams: _initialParams, fetchOnInit: true);
 
   @override
-  String map(String? params, _Response value) => 'mapped value: ${value.value}';
+  String map(_MockRequestParams? params, _Response value) =>
+      'mapped value: ${value.value}';
 }
 
-class _MockRepoFail extends SingleSourceRepo<String, _Response, String> {
+class _MockRepoFail
+    extends SingleSourceRepo<_MockRequestParams, _Response, String> {
   _MockRepoFail({required super.dataSource});
 
   @override
-  String map(String? params, _Response value) => throw const _MyException();
+  String map(_MockRequestParams? params, _Response value) =>
+      throw const _MyException();
 }
 
 final _error = Exception('fetch error');
+const _initialParams = _MockRequestParams('initial params');
+
+class _MockRequestParams implements RequestParams {
+  const _MockRequestParams(this.value);
+
+  final String value;
+
+  @override
+  String get cacheKey => throw UnimplementedError();
+
+  @override
+  String toString() => value;
+}

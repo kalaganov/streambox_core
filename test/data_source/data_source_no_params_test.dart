@@ -11,7 +11,7 @@ void main() {
 
     setUp(() {
       dataSource = _MockDataSource(
-        cacheStrategy: _MockCacheStrategy(),
+        cacheStrategy: CacheThenRefreshStrategy(cache: _MockMemoryCache()),
       );
     });
 
@@ -116,13 +116,13 @@ class _MyApiException implements Exception {
   String toString() => 'API error: $message';
 }
 
-class _MockDataSource extends BaseDataSource<void, String> {
+class _MockDataSource extends BaseDataSource<_MockRequestParams, String> {
   _MockDataSource({required super.cacheStrategy});
 
   final api = _MyApi();
 
   @override
-  Future<String> request(void params) {
+  Future<String> request(_MockRequestParams? params) {
     return api.fetchSomething();
   }
 }
@@ -140,9 +140,14 @@ class _MockMemoryCache extends BaseKeyValueCache<String> {
   String serialize(String value) => value;
 }
 
-class _MockCacheStrategy extends CacheThenRefreshStrategy<String, String> {
-  _MockCacheStrategy() : super(cache: _MockMemoryCache());
+class _MockRequestParams implements RequestParams {
+  const _MockRequestParams(this.value);
+
+  final String value;
 
   @override
-  String resolveKey(String? params) => 'static key';
+  String get cacheKey => 'cacheKey_$value}';
+
+  @override
+  String toString() => value;
 }

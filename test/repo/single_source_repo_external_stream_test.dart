@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:streambox_core/src/common/data_state.dart';
+import 'package:streambox_core/src/common/request_params.dart';
 import 'package:streambox_core/src/data_sources/base_external_stream_data_source.dart';
 import 'package:streambox_core/src/repo/single_source_repo.dart';
 import 'package:test/test.dart';
@@ -16,7 +17,7 @@ void main() {
       final events = <DataState<String>>[];
       final sub = repo.stream.listen(events.add);
 
-      repo.fetch('a');
+      repo.fetch(const _MockRequestParams('a'));
       await Future<dynamic>.delayed(Duration.zero);
 
       expect(events, isEmpty);
@@ -34,7 +35,7 @@ void main() {
       final events = <DataState<String>>[];
       final sub = repo.stream.listen(events.add);
 
-      repo.fetch('a');
+      repo.fetch(const _MockRequestParams('a'));
       await Future<dynamic>.delayed(const Duration(milliseconds: 500));
       controller.add(const _Response('stream response'));
       await Future<dynamic>.delayed(Duration.zero);
@@ -59,7 +60,7 @@ void main() {
       final events = <DataState<String>>[];
       final sub = repo.stream.listen(events.add);
 
-      repo.fetch('a');
+      repo.fetch(const _MockRequestParams('a'));
       await Future<dynamic>.delayed(const Duration(milliseconds: 500));
       controller.add(const _Response('stream response'));
       await Future<dynamic>.delayed(Duration.zero);
@@ -120,27 +121,32 @@ class _Response {
   final String value;
 }
 
-class _MockDataSource extends BaseExternalStreamDataSource<String, _Response> {
+class _MockDataSource
+    extends BaseExternalStreamDataSource<_MockRequestParams, _Response> {
   _MockDataSource({
     required super.sourceStream,
   });
 
   @override
-  void fetch([String? params, List<Object>? extras]) {}
+  void fetch([_MockRequestParams? params, List<Object>? extras]) {}
 }
 
-class _MockRepo extends SingleSourceRepo<String, _Response, String> {
+class _MockRepo
+    extends SingleSourceRepo<_MockRequestParams, _Response, String> {
   _MockRepo({required super.dataSource});
 
   @override
-  String map(String? params, _Response value) => 'mapped value: ${value.value}';
+  String map(_MockRequestParams? params, _Response value) =>
+      'mapped value: ${value.value}';
 }
 
-class _MockRepoFail extends SingleSourceRepo<String, _Response, String> {
+class _MockRepoFail
+    extends SingleSourceRepo<_MockRequestParams, _Response, String> {
   _MockRepoFail({required super.dataSource});
 
   @override
-  String map(String? params, _Response value) => throw const _MyException();
+  String map(_MockRequestParams? params, _Response value) =>
+      throw const _MyException();
 }
 
 final class _MyException implements Exception {
@@ -148,4 +154,16 @@ final class _MyException implements Exception {
 
   @override
   String toString() => '_MyException{}';
+}
+
+class _MockRequestParams implements RequestParams {
+  const _MockRequestParams(this.value);
+
+  final String value;
+
+  @override
+  String get cacheKey => throw UnimplementedError();
+
+  @override
+  String toString() => value;
 }

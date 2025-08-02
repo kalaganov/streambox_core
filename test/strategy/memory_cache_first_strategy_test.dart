@@ -5,23 +5,23 @@ import '../mock_memory_store_adapter/mock_memory_store_adapter.dart';
 
 void main() {
   group('MemoryCacheFirstStrategy', () {
-    late CacheStrategy<String, int> strategy;
+    late CacheStrategy<_MockRequestParams, int> strategy;
 
-    setUp(() => strategy = _MockStrategy());
+    setUp(() => strategy = CacheFirstStrategy(cache: _MockMemoryCache()));
 
     tearDown(() => strategy.dispose());
 
     test('emits fetch value if cache is empty', () async {
-      final events = <RequestPayload<String, int>>[];
+      final events = <RequestPayload<_MockRequestParams, int>>[];
       strategy.stream.listen(events.add);
 
-      strategy.request('key', null, () async => 1);
+      strategy.request(const _MockRequestParams('key'), null, () async => 1);
       await Future<void>.delayed(Duration.zero);
 
       expect(events.length, equals(1));
-      expect(events.single, isA<RequestSuccess<String, int>>());
+      expect(events.single, isA<RequestSuccess<_MockRequestParams, int>>());
       expect(
-        (events.single as RequestSuccess<String, int>).value,
+        (events.single as RequestSuccess<_MockRequestParams, int>).value,
         equals(1),
       );
     });
@@ -29,62 +29,62 @@ void main() {
     test(
       'emits cached value on second request even if fetch returns different',
       () async {
-        final events = <RequestPayload<String, int>>[];
+        final events = <RequestPayload<_MockRequestParams, int>>[];
         strategy.stream.listen(events.add);
 
-        strategy.request('key', null, () async => 1);
+        strategy.request(const _MockRequestParams('key'), null, () async => 1);
         await Future<void>.delayed(Duration.zero);
 
         expect(events.length, equals(1));
-        expect(events.single, isA<RequestSuccess<String, int>>());
+        expect(events.single, isA<RequestSuccess<_MockRequestParams, int>>());
         expect(
-          (events.single as RequestSuccess<String, int>).value,
+          (events.single as RequestSuccess<_MockRequestParams, int>).value,
           equals(1),
         );
 
-        strategy.request('key', null, () async => 2);
+        strategy.request(const _MockRequestParams('key'), null, () async => 2);
         await Future<void>.delayed(Duration.zero);
 
         expect(events.length, equals(2));
-        expect(events[0], isA<RequestSuccess<String, int>>());
+        expect(events[0], isA<RequestSuccess<_MockRequestParams, int>>());
         expect(
-          (events[0] as RequestSuccess<String, int>).value,
+          (events[0] as RequestSuccess<_MockRequestParams, int>).value,
           equals(1),
         );
-        expect(events[1], isA<RequestSuccess<String, int>>());
+        expect(events[1], isA<RequestSuccess<_MockRequestParams, int>>());
         expect(
-          (events[1] as RequestSuccess<String, int>).value,
+          (events[1] as RequestSuccess<_MockRequestParams, int>).value,
           equals(1),
         );
       },
     );
 
     test('emits empty after flush and new value after re-request', () async {
-      final events = <RequestPayload<String, int>>[];
+      final events = <RequestPayload<_MockRequestParams, int>>[];
       strategy.stream.listen(events.add);
 
-      strategy.request('key', null, () async => 1);
+      strategy.request(const _MockRequestParams('key'), null, () async => 1);
       await Future<void>.delayed(Duration.zero);
 
       expect(events.length, equals(1));
-      expect(events.single, isA<RequestSuccess<String, int>>());
+      expect(events.single, isA<RequestSuccess<_MockRequestParams, int>>());
       expect(
-        (events.single as RequestSuccess<String, int>).value,
+        (events.single as RequestSuccess<_MockRequestParams, int>).value,
         equals(1),
       );
 
-      strategy.request('key', null, () async => 2);
+      strategy.request(const _MockRequestParams('key'), null, () async => 2);
       await Future<void>.delayed(Duration.zero);
 
       expect(events.length, equals(2));
-      expect(events[0], isA<RequestSuccess<String, int>>());
+      expect(events[0], isA<RequestSuccess<_MockRequestParams, int>>());
       expect(
-        (events[0] as RequestSuccess<String, int>).value,
+        (events[0] as RequestSuccess<_MockRequestParams, int>).value,
         equals(1),
       );
-      expect(events[1], isA<RequestSuccess<String, int>>());
+      expect(events[1], isA<RequestSuccess<_MockRequestParams, int>>());
       expect(
-        (events[1] as RequestSuccess<String, int>).value,
+        (events[1] as RequestSuccess<_MockRequestParams, int>).value,
         equals(1),
       );
 
@@ -92,35 +92,35 @@ void main() {
       await Future<void>.delayed(Duration.zero);
 
       expect(events.length, equals(3));
-      expect(events[0], isA<RequestSuccess<String, int>>());
+      expect(events[0], isA<RequestSuccess<_MockRequestParams, int>>());
       expect(
-        (events[0] as RequestSuccess<String, int>).value,
+        (events[0] as RequestSuccess<_MockRequestParams, int>).value,
         equals(1),
       );
-      expect(events[1], isA<RequestSuccess<String, int>>());
+      expect(events[1], isA<RequestSuccess<_MockRequestParams, int>>());
       expect(
-        (events[1] as RequestSuccess<String, int>).value,
+        (events[1] as RequestSuccess<_MockRequestParams, int>).value,
         equals(1),
       );
-      expect(events[2], isA<RequestInitial<String, int>>());
+      expect(events[2], isA<RequestInitial<_MockRequestParams, int>>());
 
-      strategy.request('key', null, () async => 2);
+      strategy.request(const _MockRequestParams('key'), null, () async => 2);
       await Future<void>.delayed(Duration.zero);
       expect(events.length, equals(4));
-      expect(events[0], isA<RequestSuccess<String, int>>());
+      expect(events[0], isA<RequestSuccess<_MockRequestParams, int>>());
       expect(
-        (events[0] as RequestSuccess<String, int>).value,
+        (events[0] as RequestSuccess<_MockRequestParams, int>).value,
         equals(1),
       );
-      expect(events[1], isA<RequestSuccess<String, int>>());
+      expect(events[1], isA<RequestSuccess<_MockRequestParams, int>>());
       expect(
-        (events[1] as RequestSuccess<String, int>).value,
+        (events[1] as RequestSuccess<_MockRequestParams, int>).value,
         equals(1),
       );
-      expect(events[2], isA<RequestInitial<String, int>>());
-      expect(events[3], isA<RequestSuccess<String, int>>());
+      expect(events[2], isA<RequestInitial<_MockRequestParams, int>>());
+      expect(events[3], isA<RequestSuccess<_MockRequestParams, int>>());
       expect(
-        (events[3] as RequestSuccess<String, int>).value,
+        (events[3] as RequestSuccess<_MockRequestParams, int>).value,
         equals(2),
       );
     });
@@ -129,7 +129,7 @@ void main() {
       expectLater(
         strategy.stream,
         emits(
-          isA<RequestError<String, int>>().having(
+          isA<RequestError<_MockRequestParams, int>>().having(
             (e) => e.error,
             'error',
             isA<Exception>(),
@@ -138,18 +138,18 @@ void main() {
       );
 
       strategy.request(
-        'key',
+        const _MockRequestParams('key'),
         null,
         () async => throw Exception('fail'),
       );
     });
 
     test('request after dispose does nothing', () async {
-      final emitted = <RequestPayload<String, int>>[];
+      final emitted = <RequestPayload<_MockRequestParams, int>>[];
       strategy.stream.listen(emitted.add);
 
       await strategy.dispose();
-      strategy.request('key', null, () async => 42);
+      strategy.request(const _MockRequestParams('key'), null, () async => 42);
       await Future<void>.delayed(Duration.zero);
       expect(emitted, isEmpty);
     });
@@ -169,9 +169,14 @@ class _MockMemoryCache extends BaseKeyValueCache<int> {
   String serialize(int value) => '$value';
 }
 
-class _MockStrategy extends CacheFirstStrategy<String, int> {
-  _MockStrategy() : super(cache: _MockMemoryCache());
+class _MockRequestParams implements RequestParams {
+  const _MockRequestParams(this.value);
+
+  final String value;
 
   @override
-  String resolveKey(String? params) => '${params.hashCode}';
+  String get cacheKey => 'cacheKey_$value}';
+
+  @override
+  String toString() => value;
 }

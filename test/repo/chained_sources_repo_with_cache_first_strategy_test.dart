@@ -1,5 +1,6 @@
 import 'package:streambox_core/src/cache/key_value_cache.dart';
 import 'package:streambox_core/src/common/data_state.dart';
+import 'package:streambox_core/src/common/request_params.dart';
 import 'package:streambox_core/src/data_sources/base_data_source.dart';
 import 'package:streambox_core/src/data_sources/data_source_interface.dart';
 import 'package:streambox_core/src/repo/base_repo.dart';
@@ -21,7 +22,7 @@ void main() {
 
     setUp(() {
       primarySource = _BackendProductsDataSource(
-        cacheStrategy: _BackendProductsStrategy(),
+        cacheStrategy: CacheFirstStrategy(cache: _MockMemoryCache()),
       );
       dependentSource = _InAppPurchasesProductDetailsDataSource(
         cacheStrategy: NoOpCacheStrategy(),
@@ -294,14 +295,6 @@ class _MockMemoryCache extends BaseKeyValueCache<_BackendResponse> {
   String serialize(_BackendResponse value) => encode(value.toJson());
 }
 
-class _BackendProductsStrategy
-    extends CacheFirstStrategy<_Params, _BackendResponse> {
-  _BackendProductsStrategy() : super(cache: _MockMemoryCache());
-
-  @override
-  String resolveKey(_Params? params) => '${params!.reqId}${params.brand}';
-}
-
 class _BackendProductsDataSource
     extends BaseDataSource<_Params, _BackendResponse> {
   _BackendProductsDataSource({required super.cacheStrategy});
@@ -355,17 +348,23 @@ class _FakeRetrofitBackendProductsApi {
   );
 }
 
-class _Params {
+class _Params implements RequestParams {
   const _Params(this.reqId, this.brand);
 
   final String reqId;
   final String brand;
+
+  @override
+  String get cacheKey => '$reqId$brand';
 }
 
-class _StoreParams {
+class _StoreParams implements RequestParams {
   const _StoreParams(this.ids);
 
   final Set<String> ids;
+
+  @override
+  String get cacheKey => throw UnimplementedError();
 }
 
 class _ProductModel {

@@ -1,5 +1,6 @@
 import 'package:streambox_core/src/cache/key_value_cache.dart';
 import 'package:streambox_core/src/common/data_state.dart';
+import 'package:streambox_core/src/common/request_params.dart';
 import 'package:streambox_core/src/data_sources/base_data_source.dart';
 import 'package:streambox_core/src/data_sources/data_source_interface.dart';
 import 'package:streambox_core/src/repo/base_repo.dart';
@@ -21,7 +22,7 @@ void main() {
 
     setUp(() {
       primarySource = _BackendProductsDataSource(
-        cacheStrategy: _BackendProductsStrategy(),
+        cacheStrategy: CacheFirstStrategy(cache: _MockMemoryCache()),
       );
       dependentSource = _InAppPurchasesProductDetailsDataSource(
         cacheStrategy: NoOpCacheStrategy(),
@@ -43,8 +44,8 @@ void main() {
         _dependentFetchThrow = false;
         _mapperFetchThrow = false;
 
-        repo.fetch(const _Params('req-id-001', 'test-brand'));
-        repo.fetch(const _Params('req-id-001', 'test-brand'));
+        repo.fetch(const _MockRequestParams('req-id-001', 'test-brand'));
+        repo.fetch(const _MockRequestParams('req-id-001', 'test-brand'));
         await Future<void>.delayed(Duration.zero);
 
         expect(emitted.length, equals(2));
@@ -72,8 +73,8 @@ void main() {
         _dependentFetchThrow = false;
         _mapperFetchThrow = false;
 
-        repo.fetch(const _Params('req-id-001', 'test-brand'));
-        repo.fetch(const _Params('req-id-002', 'test-brand'));
+        repo.fetch(const _MockRequestParams('req-id-001', 'test-brand'));
+        repo.fetch(const _MockRequestParams('req-id-002', 'test-brand'));
         await Future<void>.delayed(Duration.zero);
 
         expect(emitted.length, equals(2));
@@ -99,7 +100,7 @@ void main() {
       _dependentFetchThrow = false;
       _mapperFetchThrow = false;
 
-      repo.fetch(const _Params('req-id-001', 'test-brand'));
+      repo.fetch(const _MockRequestParams('req-id-001', 'test-brand'));
       await Future<void>.delayed(Duration.zero);
 
       expect(emitted.length, equals(1));
@@ -119,7 +120,7 @@ void main() {
       _dependentFetchThrow = true;
       _mapperFetchThrow = false;
 
-      repo.fetch(const _Params('req-id-001', 'test-brand'));
+      repo.fetch(const _MockRequestParams('req-id-001', 'test-brand'));
       await Future<void>.delayed(Duration.zero);
 
       expect(emitted.length, equals(1));
@@ -139,7 +140,7 @@ void main() {
       _dependentFetchThrow = false;
       _mapperFetchThrow = true;
 
-      repo.fetch(const _Params('req-id-001', 'test-brand'));
+      repo.fetch(const _MockRequestParams('req-id-001', 'test-brand'));
       await Future<void>.delayed(Duration.zero);
 
       expect(emitted.length, equals(1));
@@ -172,7 +173,7 @@ void main() {
       final emitted = <DataState<List<_ProductModel>>>[];
       final sub = repo.stream.listen(emitted.add);
 
-      repo.fetch(const _Params('req-id-001', 'test-brand'));
+      repo.fetch(const _MockRequestParams('req-id-001', 'test-brand'));
 
       await repo.dispose();
       await repo.flush();
@@ -194,16 +195,16 @@ final _primaryFetchError = Exception('primary fetch error');
 final _dependentFetchError = Exception('dependent fetch error');
 final _mapperError = Exception('mapper error');
 
-typedef _PrimarySource = DataSource<_Params, _BackendResponse>;
+typedef _PrimarySource = DataSource<_MockRequestParams, _BackendResponse>;
 
 typedef _DependentSource = DataSource<_StoreParams, List<_StoreProductDetails>>;
 
-typedef _ProductsRepoBase = BaseRepo<_Params, List<_ProductModel>>;
+typedef _ProductsRepoBase = BaseRepo<_MockRequestParams, List<_ProductModel>>;
 
 class _ProductsRepo
     extends
         ChainedSourcesRepo<
-          _Params,
+          _MockRequestParams,
           _StoreParams,
           _BackendResponse,
           List<_StoreProductDetails>,
@@ -234,7 +235,7 @@ class _ProductsRepo
 
   @override
   _StoreParams? resolveParamsForDependentFetch(
-    _Params? params,
+    _MockRequestParams? params,
     _BackendResponse value,
   ) {
     final ids = value.products.map((p) => p.storeId).toSet();
@@ -256,22 +257,14 @@ class _MockMemoryCache extends BaseKeyValueCache<_BackendResponse> {
   String serialize(_BackendResponse value) => encode(value.toJson());
 }
 
-class _BackendProductsStrategy
-    extends CacheFirstStrategy<_Params, _BackendResponse> {
-  _BackendProductsStrategy() : super(cache: _MockMemoryCache());
-
-  @override
-  String resolveKey(_Params? params) => params!.brand;
-}
-
 class _BackendProductsDataSource
-    extends BaseDataSource<_Params, _BackendResponse> {
+    extends BaseDataSource<_MockRequestParams, _BackendResponse> {
   _BackendProductsDataSource({required super.cacheStrategy});
 
   final _api = _FakeRetrofitBackendProductsApi();
 
   @override
-  Future<_BackendResponse> request(_Params? params) {
+  Future<_BackendResponse> request(_MockRequestParams? params) {
     if (params == null) {
       throw StateError('Params cannot be null');
     }
@@ -315,17 +308,26 @@ class _FakeRetrofitBackendProductsApi {
   }) => Future.value(_backendResponse);
 }
 
-class _Params {
-  const _Params(this.reqId, this.brand);
+class _MockRequestParams implements RequestParams {
+  const _MockRequestParams(this.reqId, this.brand);
 
   final String reqId;
   final String brand;
+
+  @override
+  String get cacheKey => brand;
+
+  @override
+  String toString() => '_MockRequestParams{reqId: $reqId, brand: $brand}';
 }
 
-class _StoreParams {
+class _StoreParams implements RequestParams {
   const _StoreParams(this.ids);
 
   final Set<String> ids;
+
+  @override
+  String get cacheKey => throw UnimplementedError();
 }
 
 class _ProductModel {

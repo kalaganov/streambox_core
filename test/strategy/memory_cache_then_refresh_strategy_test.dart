@@ -5,9 +5,9 @@ import '../mock_memory_store_adapter/mock_memory_store_adapter.dart';
 
 void main() {
   group('MemoryCacheThenRefreshStrategy', () {
-    late CacheStrategy<String, int> strategy;
+    late CacheStrategy<_MockRequestParams, int> strategy;
 
-    setUp(() => strategy = _MockStrategy());
+    setUp(() => strategy = CacheThenRefreshStrategy(cache: _MockMemoryCache()));
 
     tearDown(() async => strategy.dispose());
 
@@ -15,7 +15,7 @@ void main() {
       expectLater(
         strategy.stream,
         emitsInOrder([
-          isA<RequestSuccess<String, int>>().having(
+          isA<RequestSuccess<_MockRequestParams, int>>().having(
             (e) => e.value,
             'value',
             42,
@@ -23,7 +23,7 @@ void main() {
         ]),
       );
 
-      strategy.request('key', null, () async => 42);
+      strategy.request(const _MockRequestParams('key'), null, () async => 42);
     });
 
     test('emits cached value then new value if different', () async {
@@ -32,9 +32,9 @@ void main() {
         if (e case RequestSuccess(:final value)) events.add(value);
       });
 
-      strategy.request('key', null, () async => 1);
+      strategy.request(const _MockRequestParams('key'), null, () async => 1);
       await Future<void>.delayed(Duration.zero);
-      strategy.request('key', null, () async => 2);
+      strategy.request(const _MockRequestParams('key'), null, () async => 2);
       await Future<void>.delayed(Duration.zero);
 
       await sub.cancel();
@@ -47,13 +47,13 @@ void main() {
         if (e case RequestSuccess(:final value)) events.add(value);
       });
 
-      strategy.request('key', null, () async => 1);
+      strategy.request(const _MockRequestParams('key'), null, () async => 1);
       await Future<void>.delayed(Duration.zero);
-      strategy.request('key', null, () async => 1);
+      strategy.request(const _MockRequestParams('key'), null, () async => 1);
       await Future<void>.delayed(Duration.zero);
-      strategy.request('key', null, () async => 2);
+      strategy.request(const _MockRequestParams('key'), null, () async => 2);
       await Future<void>.delayed(Duration.zero);
-      strategy.request('key', null, () async => 2);
+      strategy.request(const _MockRequestParams('key'), null, () async => 2);
       await Future<void>.delayed(Duration.zero);
 
       await sub.cancel();
@@ -64,7 +64,7 @@ void main() {
       expectLater(
         strategy.stream,
         emits(
-          isA<RequestError<String, int>>().having(
+          isA<RequestError<_MockRequestParams, int>>().having(
             (e) => e.error,
             'error',
             isA<Exception>(),
@@ -73,44 +73,44 @@ void main() {
       );
 
       strategy.request(
-        'key',
+        const _MockRequestParams('key'),
         null,
         () async => throw Exception('fail'),
       );
     });
 
     test('flush emits DataInitial and resets cache', () async {
-      final events = <RequestPayload<String, int>>[];
+      final events = <RequestPayload<_MockRequestParams, int>>[];
       final sub = strategy.stream.listen(events.add);
 
-      strategy.request('key', null, () async => 1);
+      strategy.request(const _MockRequestParams('key'), null, () async => 1);
       await Future<void>.delayed(Duration.zero);
       await strategy.flush();
       await Future<void>.delayed(Duration.zero);
-      strategy.request('key', null, () async => 2);
+      strategy.request(const _MockRequestParams('key'), null, () async => 2);
       await Future<void>.delayed(Duration.zero);
 
       await sub.cancel();
 
       expect(events.length, equals(3));
-      expect(events[0], isA<RequestSuccess<String, int>>());
+      expect(events[0], isA<RequestSuccess<_MockRequestParams, int>>());
       expect(
-        (events[0] as RequestSuccess<String, int>).value,
+        (events[0] as RequestSuccess<_MockRequestParams, int>).value,
         equals(1),
       );
-      expect(events[1], isA<RequestInitial<String, int>>());
-      expect(events[2], isA<RequestSuccess<String, int>>());
+      expect(events[1], isA<RequestInitial<_MockRequestParams, int>>());
+      expect(events[2], isA<RequestSuccess<_MockRequestParams, int>>());
       expect(
-        (events[2] as RequestSuccess<String, int>).value,
+        (events[2] as RequestSuccess<_MockRequestParams, int>).value,
         equals(2),
       );
     });
 
     test('repeated flush resets cache each time', () async {
-      final events = <RequestPayload<String, int>>[];
+      final events = <RequestPayload<_MockRequestParams, int>>[];
       final sub = strategy.stream.listen(events.add);
 
-      strategy.request('key', null, () async => 10);
+      strategy.request(const _MockRequestParams('key'), null, () async => 10);
       await Future<void>.delayed(Duration.zero);
       await strategy.flush();
       await Future<void>.delayed(Duration.zero);
@@ -120,13 +120,13 @@ void main() {
       await sub.cancel();
 
       expect(events.length, equals(3));
-      expect(events[0], isA<RequestSuccess<String, int>>());
+      expect(events[0], isA<RequestSuccess<_MockRequestParams, int>>());
       expect(
-        (events[0] as RequestSuccess<String, int>).value,
+        (events[0] as RequestSuccess<_MockRequestParams, int>).value,
         equals(10),
       );
-      expect(events[1], isA<RequestInitial<String, int>>());
-      expect(events[2], isA<RequestInitial<String, int>>());
+      expect(events[1], isA<RequestInitial<_MockRequestParams, int>>());
+      expect(events[2], isA<RequestInitial<_MockRequestParams, int>>());
     });
 
     test('handles multiple keys independently', () async {
@@ -135,11 +135,11 @@ void main() {
         if (e case RequestSuccess(:final value)) events.add(value);
       });
 
-      strategy.request('a', null, () async => 1);
+      strategy.request(const _MockRequestParams('a'), null, () async => 1);
       await Future<void>.delayed(Duration.zero);
-      strategy.request('b', null, () async => 2);
+      strategy.request(const _MockRequestParams('b'), null, () async => 2);
       await Future<void>.delayed(Duration.zero);
-      strategy.request('a', null, () async => 42);
+      strategy.request(const _MockRequestParams('a'), null, () async => 42);
       await Future<void>.delayed(Duration.zero);
 
       await sub.cancel();
@@ -152,11 +152,11 @@ void main() {
         if (e case RequestSuccess(:final value)) events.add(value);
       });
 
-      strategy.request('key', null, () async => 1);
+      strategy.request(const _MockRequestParams('key'), null, () async => 1);
       await Future<void>.delayed(Duration.zero);
       await strategy.flush();
       await Future<void>.delayed(Duration.zero);
-      strategy.request('key', null, () async => 2);
+      strategy.request(const _MockRequestParams('key'), null, () async => 2);
       await Future<void>.delayed(Duration.zero);
 
       await sub.cancel();
@@ -164,36 +164,36 @@ void main() {
     });
 
     test('emits value after error on next request', () async {
-      final events = <RequestPayload<String, int>>[];
+      final events = <RequestPayload<_MockRequestParams, int>>[];
       final sub = strategy.stream.listen(events.add);
 
       strategy.request(
-        'key',
+        const _MockRequestParams('key'),
         null,
         () async => throw Exception('fail'),
       );
       await Future<void>.delayed(Duration.zero);
 
-      strategy.request('key', null, () async => 5);
+      strategy.request(const _MockRequestParams('key'), null, () async => 5);
       await Future<void>.delayed(Duration.zero);
 
       await sub.cancel();
 
       expect(events.length, equals(2));
-      expect(events[0], isA<RequestError<String, int>>());
-      expect(events[1], isA<RequestSuccess<String, int>>());
+      expect(events[0], isA<RequestError<_MockRequestParams, int>>());
+      expect(events[1], isA<RequestSuccess<_MockRequestParams, int>>());
       expect(
-        (events[1] as RequestSuccess<String, int>).value,
+        (events[1] as RequestSuccess<_MockRequestParams, int>).value,
         equals(5),
       );
     });
 
     test('request after dispose does nothing', () async {
-      final events = <RequestPayload<String, int>>[];
+      final events = <RequestPayload<_MockRequestParams, int>>[];
       final sub = strategy.stream.listen(events.add);
 
       await strategy.dispose();
-      strategy.request('key', null, () async => 42);
+      strategy.request(const _MockRequestParams('key'), null, () async => 42);
       await Future<void>.delayed(Duration.zero);
 
       await sub.cancel();
@@ -201,7 +201,7 @@ void main() {
     });
 
     test('flush without active subscription still works', () async {
-      strategy.request('key', null, () async => 1);
+      strategy.request(const _MockRequestParams('key'), null, () async => 1);
       await strategy.flush();
     });
 
@@ -225,9 +225,14 @@ class _MockMemoryCache extends BaseKeyValueCache<int> {
   String serialize(int value) => '$value';
 }
 
-class _MockStrategy extends CacheThenRefreshStrategy<String, int> {
-  _MockStrategy() : super(cache: _MockMemoryCache());
+class _MockRequestParams implements RequestParams {
+  const _MockRequestParams(this.value);
+
+  final String value;
 
   @override
-  String resolveKey(String? params) => '${params.hashCode}';
+  String get cacheKey => 'cacheKey_$value}';
+
+  @override
+  String toString() => value;
 }

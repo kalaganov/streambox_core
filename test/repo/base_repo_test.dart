@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:streambox_core/src/common/data_state.dart';
+import 'package:streambox_core/src/common/request_params.dart';
 import 'package:streambox_core/src/repo/base_repo.dart';
 import 'package:test/test.dart';
 
@@ -100,7 +101,7 @@ void main() {
   });
 }
 
-class _TestRepo extends BaseRepo<String, String> {
+class _TestRepo extends BaseRepo<_MockRequestParams, String> {
   void emitLoading() => handleLoading();
 
   void emitSuccess(String val) => handleData(val);
@@ -111,10 +112,10 @@ class _TestRepo extends BaseRepo<String, String> {
   Future<void> flush() async => handleFlush();
 
   @override
-  void fetch([String? p]) {}
+  void fetch([_MockRequestParams? params]) {}
 }
 
-class _TestRepoWithReplay extends BaseRepo<String, String> {
+class _TestRepoWithReplay extends BaseRepo<_MockRequestParams, String> {
   _TestRepoWithReplay() : super(replayLast: true);
 
   void emitSuccess(String val) => handleData(val);
@@ -123,5 +124,14 @@ class _TestRepoWithReplay extends BaseRepo<String, String> {
   Future<void> flush() async => handleFlush();
 
   @override
-  void fetch([String? p]) {}
+  void fetch([_MockRequestParams? params]) {}
+}
+
+class _MockRequestParams implements RequestParams {
+  _MockRequestParams(this.value);
+
+  final String value;
+
+  @override
+  String get cacheKey => throw UnimplementedError();
 }

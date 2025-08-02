@@ -6,7 +6,7 @@ import 'package:test/test.dart';
 void main() {
   group('BaseRepo with external stream datasource NoParams', () {
     test('does nothing after fetch', () async {
-      late DataSource<void, _Response> source;
+      late DataSource<_MockRequestParams, _Response> source;
 
       final controller = StreamController<_Response>.broadcast();
 
@@ -14,7 +14,7 @@ void main() {
         sourceStream: controller.stream,
       );
 
-      final events = <RequestPayload<void, _Response>>[];
+      final events = <RequestPayload<_MockRequestParams, _Response>>[];
       final sub = source.stream.listen(events.add);
 
       source.fetch();
@@ -27,7 +27,7 @@ void main() {
     });
 
     test('emits DataSuccess after fetch', () async {
-      late DataSource<void, _Response> source;
+      late DataSource<_MockRequestParams, _Response> source;
 
       final controller = StreamController<_Response>.broadcast();
 
@@ -35,7 +35,7 @@ void main() {
         sourceStream: controller.stream,
       );
 
-      final events = <RequestPayload<void, _Response>>[];
+      final events = <RequestPayload<_MockRequestParams, _Response>>[];
       final sub = source.stream.listen(events.add);
 
       source.fetch();
@@ -44,9 +44,11 @@ void main() {
       await Future<dynamic>.delayed(Duration.zero);
 
       expect(events.length, 1);
-      expect(events.last, isA<RequestPayload<void, _Response>>());
+      expect(events.last, isA<RequestPayload<_MockRequestParams, _Response>>());
       expect(
-        (events.last as RequestSuccess<void, _Response>).value.value,
+        (events.last as RequestSuccess<_MockRequestParams, _Response>)
+            .value
+            .value,
         equals('stream response'),
       );
 
@@ -54,35 +56,35 @@ void main() {
       await source.dispose();
     });
     test('emits DataInitial', () async {
-      late DataSource<void, _Response> source;
+      late DataSource<_MockRequestParams, _Response> source;
 
       final controller = StreamController<_Response>.broadcast();
 
       source = _MockDataSource(
         sourceStream: controller.stream,
       );
-      final events = <RequestPayload<void, _Response>>[];
+      final events = <RequestPayload<_MockRequestParams, _Response>>[];
       final sub = source.stream.listen(events.add);
 
       await source.flush();
       await Future<dynamic>.delayed(Duration.zero);
 
       expect(events.length, 1);
-      expect(events.last, isA<RequestPayload<void, _Response>>());
+      expect(events.last, isA<RequestPayload<_MockRequestParams, _Response>>());
 
       await sub.cancel();
       await source.dispose();
     });
 
     test('fetch after dispose does nothing', () async {
-      late DataSource<void, _Response> source;
+      late DataSource<_MockRequestParams, _Response> source;
 
       final controller = StreamController<_Response>.broadcast();
 
       source = _MockDataSource(
         sourceStream: controller.stream,
       );
-      final events = <RequestPayload<void, _Response>>[];
+      final events = <RequestPayload<_MockRequestParams, _Response>>[];
       final sub = source.stream.listen(events.add);
 
       await source.dispose();
@@ -104,11 +106,22 @@ class _Response {
   final String value;
 }
 
-class _MockDataSource extends BaseExternalStreamDataSource<void, _Response> {
-  _MockDataSource({
-    required super.sourceStream,
-  });
+class _MockDataSource
+    extends BaseExternalStreamDataSource<_MockRequestParams, _Response> {
+  _MockDataSource({required super.sourceStream});
 
   @override
   void fetch([void params, List<Object>? extras]) {}
+}
+
+class _MockRequestParams implements RequestParams {
+  const _MockRequestParams(this.value);
+
+  final String value;
+
+  @override
+  String get cacheKey => throw UnimplementedError();
+
+  @override
+  String toString() => value;
 }
