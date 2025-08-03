@@ -35,6 +35,34 @@ void main() {
       await repo.dispose();
     });
 
+    test('emits DataSuccess on fetchAwait', () async {
+      late DataSource<_MockRequestParams, _Response> source;
+      late Repo<_MockRequestParams, String> repo;
+
+      source = _MockDataSource();
+      repo = _MockRepoImpl(dataSource: source);
+
+      final events = <DataState<String>>[];
+      final sub = repo.stream.listen(events.add);
+
+      final result = await repo.fetchAwait(const _MockRequestParams('a'));
+
+      expect(events.length, 1);
+      expect(events.last, isA<DataSuccess<String>>());
+      expect(
+        (events.last as DataSuccess<String>).value,
+        equals('mapped value: success'),
+      );
+      expect(result, isA<DataSuccess<String>>());
+      expect(
+        (result as DataSuccess<String>).value,
+        equals('mapped value: success'),
+      );
+
+      await sub.cancel();
+      await repo.dispose();
+    });
+
     test('emits DataSuccess initial fetch', () async {
       late DataSource<_MockRequestParams, _Response> source;
       late Repo<_MockRequestParams, String> repo;

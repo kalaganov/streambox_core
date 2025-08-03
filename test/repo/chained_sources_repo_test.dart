@@ -65,6 +65,35 @@ void main() {
     );
 
     test(
+      'returns ProductModel list on fetchAwait',
+      () async {
+        final emitted = <DataState<List<_ProductModel>>>[];
+        final sub = repo.stream.listen(emitted.add);
+        _primaryFetchThrow = false;
+        _dependentFetchThrow = false;
+        _mapperFetchThrow = false;
+
+        final result = await repo.fetchAwait(
+          const _MockRequestParams('req-id-001', 'test-brand'),
+        );
+
+        expect(emitted.length, equals(1));
+        expect(emitted[0], isA<DataSuccess<List<_ProductModel>>>());
+        expect(
+          (emitted[0] as DataSuccess<List<_ProductModel>>).value.first,
+          isA<_ProductModel>(),
+        );
+        expect(result, isA<DataSuccess<List<_ProductModel>>>());
+        expect(
+          (result as DataSuccess<List<_ProductModel>>).value.first,
+          isA<_ProductModel>(),
+        );
+
+        await sub.cancel();
+      },
+    );
+
+    test(
       'returns ProductModel list when fetches use different params',
       () async {
         final emitted = <DataState<List<_ProductModel>>>[];

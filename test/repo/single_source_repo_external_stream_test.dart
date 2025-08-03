@@ -51,6 +51,36 @@ void main() {
       await repo.dispose();
     });
 
+    test('emits DataSuccess after fetchAwait', () async {
+      final controller = StreamController<_Response>.broadcast();
+
+      final source = _MockDataSource(sourceStream: controller.stream);
+      final repo = _MockRepo(dataSource: source);
+
+      final events = <DataState<String>>[];
+      final sub = repo.stream.listen(events.add);
+
+      Future.delayed(const Duration(milliseconds: 100), () {
+        controller.add(const _Response('stream response'));
+      });
+      final result = await repo.fetchAwait(const _MockRequestParams('a'));
+
+      expect(events.length, 1);
+      expect(events.last, isA<DataSuccess<String>>());
+      expect(
+        (events.last as DataSuccess<String>).value,
+        'mapped value: stream response',
+      );
+      expect(result, isA<DataSuccess<String>>());
+      expect(
+        (result as DataSuccess<String>).value,
+        'mapped value: stream response',
+      );
+
+      await sub.cancel();
+      await repo.dispose();
+    });
+
     test('emits DataError if mapper throws', () async {
       final controller = StreamController<_Response>.broadcast();
 
