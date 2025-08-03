@@ -25,9 +25,7 @@ abstract class BaseExternalStreamDataSource<P extends RequestParams, R>
   ///
   /// The [sourceStream] provides external values that will be mapped
   /// to request payloads and broadcast to consumers.
-  BaseExternalStreamDataSource({
-    required Stream<R> sourceStream,
-  }) {
+  BaseExternalStreamDataSource({required Stream<R> sourceStream}) {
     _subscription = sourceStream.listen(_onData, onError: _onError);
   }
 

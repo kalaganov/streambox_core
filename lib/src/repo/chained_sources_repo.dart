@@ -109,10 +109,7 @@ abstract class ChainedSourcesRepo<
   /// and resets the repository state.
   @override
   Future<void> flush() async {
-    await Future.wait([
-      _primarySource.flush(),
-      _dependentSource.flush(),
-    ]);
+    await Future.wait([_primarySource.flush(), _dependentSource.flush()]);
     handleFlush();
   }
 

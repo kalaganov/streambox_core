@@ -28,9 +28,8 @@ abstract class BaseDataSource<P extends RequestParams, R>
   ///
   /// The [cacheStrategy] defines how requests are handled, cached,
   /// and emitted to the [stream].
-  BaseDataSource({
-    required CacheStrategy<P, R> cacheStrategy,
-  }) : _cacheStrategy = cacheStrategy {
+  BaseDataSource({required CacheStrategy<P, R> cacheStrategy})
+    : _cacheStrategy = cacheStrategy {
     _strategySubscription = _cacheStrategy.stream.listen(_onData);
   }
 
