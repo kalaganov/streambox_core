@@ -1,3 +1,7 @@
+## 1.3.2
+
+- Added `fetchAwait` method to `Repo` for awaiting the first emitted state.
+
 ## 1.3.1
 
 - fix README and example

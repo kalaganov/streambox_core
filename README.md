@@ -81,7 +81,7 @@ Repositories optionally support:
 - `initialFetchParams` to perform an immediate request with parameters
 - `fetchOnInit` to trigger the first request on creation
 - `replayLast` to replay the last emitted state to new subscribers
-
+- `fetchAwait` to perform a fetch and await the first emitted state
 ---
 
 ## 🗄️ Storage Adapters
