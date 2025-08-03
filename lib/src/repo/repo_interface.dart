@@ -16,6 +16,26 @@ abstract interface class Repo<P extends RequestParams, E> {
   /// Implementations should push resulting states to the [stream].
   void fetch([P? p]);
 
+  /// Initiates a data fetch and awaits the first emitted state.
+  ///
+  /// Use this when synchronous-like behavior is needed: the method
+  /// subscribes to [stream], triggers [fetch] with optional [p],
+  /// and returns the first emitted [DataState].
+  ///
+  /// Unlike [fetch], this method provides a [Future] that resolves
+  /// once the repository emits its first state. This avoids common
+  /// race conditions that may occur if listening to [stream] and
+  /// calling [fetch] separately.
+  ///
+  /// Example:
+  /// ```dart
+  /// final result = await repo.fetchAwait(params);
+  /// if (result is DataSuccess) {
+  ///   // handle success
+  /// }
+  /// ```
+  Future<DataState<E>> fetchAwait([P? p]);
+
   /// A stream of [DataState] objects representing the current
   /// state of the data flow, such as loading, success, or error.
   Stream<DataState<E>> get stream;

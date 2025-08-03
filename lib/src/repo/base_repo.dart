@@ -47,6 +47,30 @@ abstract class BaseRepo<P extends RequestParams, E> implements Repo<P, E> {
   @nonVirtual
   Stream<DataState<E>> get stream => _streamAdapter.stream;
 
+  /// Initiates a fetch and awaits the first emitted state.
+  ///
+  /// This method ensures safe sequencing by subscribing to [stream]
+  /// before invoking [fetch]. It returns the first [DataState] emitted
+  /// by the repository after the fetch begins.
+  ///
+  /// Use this when you need to synchronously await the result of a fetch
+  /// rather than subscribing manually to the [stream].
+  ///
+  /// Example:
+  /// ```dart
+  /// final state = await repo.fetchAwait(params);
+  /// if (state is DataSuccess<MyEntity>) {
+  ///   // handle successful data
+  /// }
+  /// ```
+  @override
+  @nonVirtual
+  Future<DataState<E>> fetchAwait([P? p]) {
+    final future = stream.first;
+    fetch(p);
+    return future;
+  }
+
   /// Emits a loading state to the stream.
   @protected
   void handleLoading() => _streamAdapter.safeAddMapped(DataLoading<E>());
