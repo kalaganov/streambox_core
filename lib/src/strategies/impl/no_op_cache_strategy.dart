@@ -39,7 +39,11 @@ final class NoOpCacheStrategy<P extends RequestParams, R>
     try {
       final result = await fetch();
       _controller.safeAdd(
-        RequestSuccess(params: params, value: result, extras: extras),
+        RequestSuccess(
+          params: params,
+          value: result,
+          extras: [...?extras, result as Object],
+        ),
       );
     } on Object catch (e, st) {
       _controller.safeAdd(
