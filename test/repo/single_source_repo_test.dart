@@ -217,7 +217,7 @@ final class _MyException implements Exception {
 }
 
 class _MockDataSource extends BaseDataSource<_MockRequestParams, _Response> {
-  _MockDataSource() : super(cacheStrategy: NoOpCacheStrategy());
+  _MockDataSource() : super(cacheStrategy: _MockNoOpCacheStrategy());
 
   @override
   Future<_Response> request(_MockRequestParams? params) {
@@ -227,7 +227,7 @@ class _MockDataSource extends BaseDataSource<_MockRequestParams, _Response> {
 
 class _MockDataSourceInitial
     extends BaseDataSource<_MockRequestParams, _Response> {
-  _MockDataSourceInitial() : super(cacheStrategy: NoOpCacheStrategy());
+  _MockDataSourceInitial() : super(cacheStrategy: _MockNoOpCacheStrategy());
 
   @override
   Future<_Response> request(_MockRequestParams? params) {
@@ -237,7 +237,7 @@ class _MockDataSourceInitial
 
 class _MockDataSourceFail
     extends BaseDataSource<_MockRequestParams, _Response> {
-  _MockDataSourceFail() : super(cacheStrategy: NoOpCacheStrategy());
+  _MockDataSourceFail() : super(cacheStrategy: _MockNoOpCacheStrategy());
 
   @override
   Future<_Response> request(_MockRequestParams? params) {
@@ -286,4 +286,9 @@ class _MockRequestParams implements RequestParams {
 
   @override
   String toString() => value;
+}
+
+class _MockNoOpCacheStrategy
+    extends NoOpCacheStrategy<_MockRequestParams, _Response> {
+  _MockNoOpCacheStrategy();
 }

@@ -11,7 +11,7 @@ void main() {
 
     setUp(() {
       dataSource = _MockDataSource(
-        cacheStrategy: CacheThenRefreshStrategy(cache: _MockMemoryCache()),
+        cacheStrategy: _MockCacheThenRefreshStrategy(cache: _MockMemoryCache()),
       );
     });
 
@@ -160,4 +160,9 @@ class _MockMemoryCache extends BaseKeyValueCache<String> {
 
   @override
   String serialize(String value) => value;
+}
+
+class _MockCacheThenRefreshStrategy
+    extends CacheThenRefreshStrategy<_MockRequestParams, String> {
+  _MockCacheThenRefreshStrategy({required super.cache});
 }

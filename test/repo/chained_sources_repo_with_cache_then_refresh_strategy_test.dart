@@ -22,10 +22,10 @@ void main() {
 
     setUp(() {
       primarySource = _BackendProductsDataSource(
-        cacheStrategy: CacheThenRefreshStrategy(cache: _MockMemoryCache()),
+        cacheStrategy: _MockCacheThenRefreshStrategy(cache: _MockMemoryCache()),
       );
       dependentSource = _InAppPurchasesProductDetailsDataSource(
-        cacheStrategy: NoOpCacheStrategy(),
+        cacheStrategy: _MockNoOpCacheStrategy(),
       );
       repo = _ProductsRepo(
         primarySource: primarySource,
@@ -67,7 +67,7 @@ void main() {
 
     test(
       'returns ProductModel list on fetchAwait',
-          () async {
+      () async {
         final emitted = <DataState<List<_ProductModel>>>[];
         final sub = repo.stream.listen(emitted.add);
         _primaryFetchThrow = false;
@@ -508,3 +508,13 @@ const _storeResponse = [
     currencySign: r'$',
   ),
 ];
+
+class _MockCacheThenRefreshStrategy
+    extends CacheThenRefreshStrategy<_Params, _BackendResponse> {
+  _MockCacheThenRefreshStrategy({required super.cache});
+}
+
+class _MockNoOpCacheStrategy
+    extends NoOpCacheStrategy<_StoreParams, List<_StoreProductDetails>> {
+  _MockNoOpCacheStrategy();
+}

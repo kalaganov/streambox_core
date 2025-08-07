@@ -22,10 +22,10 @@ void main() {
 
     setUp(() {
       primarySource = _BackendProductsDataSource(
-        cacheStrategy: CacheFirstStrategy(cache: _MockMemoryCache()),
+        cacheStrategy: _MockCacheFirstStrategy(cache: _MockMemoryCache()),
       );
       dependentSource = _InAppPurchasesProductDetailsDataSource(
-        cacheStrategy: NoOpCacheStrategy(),
+        cacheStrategy: _MockNoOpCacheStrategy(),
       );
       repo = _ProductsRepo(
         primarySource: primarySource,
@@ -466,3 +466,13 @@ const _storeResponse = [
     currencySign: r'$',
   ),
 ];
+
+class _MockCacheFirstStrategy
+    extends CacheFirstStrategy<_MockRequestParams, _BackendResponse> {
+  _MockCacheFirstStrategy({required super.cache});
+}
+
+class _MockNoOpCacheStrategy
+    extends NoOpCacheStrategy<_StoreParams, List<_StoreProductDetails>> {
+  _MockNoOpCacheStrategy();
+}

@@ -7,7 +7,7 @@ void main() {
   group('NoOpCacheStrategy', () {
     late CacheStrategy<_MockRequestParams, int> strategy;
 
-    setUp(() => strategy = NoOpCacheStrategy());
+    setUp(() => strategy = _MockCacheStrategy());
     tearDown(() => strategy.dispose());
 
     test('emits value returned by fetch', () {
@@ -148,4 +148,8 @@ class _MockRequestParams implements RequestParams {
 
   @override
   String toString() => value;
+}
+
+class _MockCacheStrategy extends NoOpCacheStrategy<_MockRequestParams, int> {
+  _MockCacheStrategy();
 }

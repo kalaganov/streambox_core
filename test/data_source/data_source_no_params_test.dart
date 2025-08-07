@@ -11,7 +11,7 @@ void main() {
 
     setUp(() {
       dataSource = _MockDataSource(
-        cacheStrategy: CacheThenRefreshStrategy(cache: _MockMemoryCache()),
+        cacheStrategy: _MockCacheThenRefreshStrategy(cache: _MockMemoryCache()),
       );
     });
 
@@ -150,4 +150,9 @@ class _MockRequestParams implements RequestParams {
 
   @override
   String toString() => value;
+}
+
+class _MockCacheThenRefreshStrategy
+    extends CacheThenRefreshStrategy<_MockRequestParams, String> {
+  _MockCacheThenRefreshStrategy({required super.cache});
 }

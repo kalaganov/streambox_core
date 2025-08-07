@@ -7,7 +7,7 @@ void main() {
   group('MemoryCacheFirstStrategy', () {
     late CacheStrategy<_MockRequestParams, int> strategy;
 
-    setUp(() => strategy = CacheFirstStrategy(cache: _MockMemoryCache()));
+    setUp(() => strategy = _MockCacheStrategy(cache: _MockMemoryCache()));
 
     tearDown(() => strategy.dispose());
 
@@ -179,4 +179,8 @@ class _MockRequestParams implements RequestParams {
 
   @override
   String toString() => value;
+}
+
+class _MockCacheStrategy extends CacheFirstStrategy<_MockRequestParams, int> {
+  _MockCacheStrategy({required super.cache});
 }

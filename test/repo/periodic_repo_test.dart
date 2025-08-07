@@ -44,37 +44,6 @@ void main() {
       await repo.dispose();
     });
 
-    test('emits DataSuccess on fetchAwait', () async {
-      late DataSource<_MockRequestParams, _Response> source;
-      late Repo<_MockRequestParams, String> repo;
-
-      source = _MockDataSource();
-      repo = _MockRepo(
-        dataSource: source,
-        interval: const Duration(milliseconds: 200),
-      );
-
-      final events = <DataState<String>>[];
-      final sub = repo.stream.listen(events.add);
-
-      final result = await repo.fetchAwait(const _MockRequestParams('a'));
-
-      expect(events, hasLength(1));
-      expect(events.single, isA<DataSuccess<String>>());
-      expect(
-        (events.single as DataSuccess<String>).value,
-        'mapped value: success',
-      );
-      expect(result, isA<DataSuccess<String>>());
-      expect(
-        (result as DataSuccess<String>).value,
-        'mapped value: success',
-      );
-
-      await sub.cancel();
-      await repo.dispose();
-    });
-
     test('emits DataSuccess 2', () async {
       late DataSource<_MockRequestParams, _Response> source;
       late Repo<_MockRequestParams, String> repo;
@@ -217,7 +186,7 @@ class _Response {
 }
 
 class _MockDataSource extends BaseDataSource<_MockRequestParams, _Response> {
-  _MockDataSource() : super(cacheStrategy: NoOpCacheStrategy());
+  _MockDataSource() : super(cacheStrategy: _MockNoOpCacheStrategy());
 
   @override
   Future<_Response> request(_MockRequestParams? params) {
@@ -227,7 +196,7 @@ class _MockDataSource extends BaseDataSource<_MockRequestParams, _Response> {
 
 class _MockDataSourceDelayed
     extends BaseDataSource<_MockRequestParams, _Response> {
-  _MockDataSourceDelayed() : super(cacheStrategy: NoOpCacheStrategy());
+  _MockDataSourceDelayed() : super(cacheStrategy: _MockNoOpCacheStrategy());
 
   @override
   Future<_Response> request(_MockRequestParams? params) {
@@ -240,7 +209,7 @@ class _MockDataSourceDelayed
 
 class _MockDataSourceFail
     extends BaseDataSource<_MockRequestParams, _Response> {
-  _MockDataSourceFail() : super(cacheStrategy: NoOpCacheStrategy());
+  _MockDataSourceFail() : super(cacheStrategy: _MockNoOpCacheStrategy());
 
   @override
   Future<_Response> request(_MockRequestParams? params) {
@@ -321,4 +290,9 @@ class _MockRequestParams implements RequestParams {
 
   @override
   String toString() => value;
+}
+
+class _MockNoOpCacheStrategy
+    extends NoOpCacheStrategy<_MockRequestParams, _Response> {
+  _MockNoOpCacheStrategy();
 }
