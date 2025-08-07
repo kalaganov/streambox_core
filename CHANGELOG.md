@@ -1,3 +1,8 @@
+## 1.4.0
+
+- Introduced `shouldSkipCache` to `BaseCacheStrategy` for fine-grained control over cache usage.
+- Made all built-in cache strategies (`CacheFirstStrategy`, `CacheThenRefreshStrategy`, `NoOpCacheStrategy`) extensible by marking them as `abstract`.
+
 ## 1.3.2
 
 - Added `fetchAwait` method to `Repo` for awaiting the first emitted state.
