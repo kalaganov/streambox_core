@@ -18,7 +18,7 @@ import 'package:streambox_core/src/strategies/base/cache_strategy_interface.dart
 /// Type Parameters:
 /// - [P] – Request parameters extending [RequestParams].
 /// - [R] – Type of request value.
-final class NoOpCacheStrategy<P extends RequestParams, R>
+abstract class NoOpCacheStrategy<P extends RequestParams, R>
     implements CacheStrategy<P, R> {
   final _controller = StreamController<RequestPayload<P, R>>.broadcast();
 

@@ -22,7 +22,7 @@ import 'package:streambox_core/src/strategies/base/base_cache_strategy.dart';
 /// Type Parameters:
 /// - [P] – Request parameters extending [RequestParams].
 /// - [R] – Type of cached or fetched value.
-final class CacheThenRefreshStrategy<P extends RequestParams, R>
+abstract class CacheThenRefreshStrategy<P extends RequestParams, R>
     extends BaseCacheStrategy<P, R> {
   /// Creates a [CacheThenRefreshStrategy] with the given [cache].
   CacheThenRefreshStrategy({required super.cache});
@@ -38,7 +38,10 @@ final class CacheThenRefreshStrategy<P extends RequestParams, R>
 
     final cachedValue = await readCachedValue(key);
     if (reqVersion != currentRequestVersion) return;
-    handleDataIfNotNull(params, extras, cachedValue);
+
+    if (!shouldSkipCache(params, cachedValue)) {
+      handleDataIfNotNull(params, extras, cachedValue);
+    }
 
     final newValue = await fetch();
     if (reqVersion != currentRequestVersion) return;
@@ -49,4 +52,7 @@ final class CacheThenRefreshStrategy<P extends RequestParams, R>
       handleData(params, extras, newValue);
     }
   }
+
+  @override
+  bool shouldSkipCache(P? params, R? value) => false;
 }

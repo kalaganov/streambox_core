@@ -48,6 +48,29 @@ abstract class BaseCacheStrategy<P extends RequestParams, R>
   @nonVirtual
   String resolveKey(P? params) => params?.cacheKey ?? kDefaultCacheKey;
 
+  /// Determines whether the cache should be skipped for the given request.
+  ///
+  /// Called before returning a cached value. If this method returns `true`,
+  /// the cached value (if any) will be ignored, and a new fetch will be
+  /// performed instead.
+  ///
+  /// This allows for dynamic, per-request decisions about whether to
+  /// trust the cache. For example, you might skip cache if:
+  ///
+  /// - The cached value is too old or invalid.
+  /// - The business logic requires always up-to-date data in certain cases.
+  ///
+  /// Implementations should ensure that the logic here is lightweight,
+  /// as it may be called frequently for each request.
+  ///
+  /// - [params] – Parameters of the request (may be `null`).
+  /// - [cachedValue] – Value retrieved from cache (may be `null`).
+  ///
+  /// Returns `true` to skip the cache and perform a new fetch,
+  /// or `false` to use the cached value if available.
+  @protected
+  bool shouldSkipCache(P? params, R? cachedValue);
+
   /// Clears all cached values and resets the request version.
   ///
   /// After flushing, an initial request state is emitted to the [stream].
