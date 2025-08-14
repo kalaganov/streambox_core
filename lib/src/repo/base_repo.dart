@@ -7,6 +7,7 @@ import 'package:streambox_core/src/common/adapter/broadcast_stream_adapter.dart'
 import 'package:streambox_core/src/common/adapter/stream_adapter.dart';
 import 'package:streambox_core/src/common/data_state.dart';
 import 'package:streambox_core/src/common/request_params.dart';
+import 'package:streambox_core/src/observer/stream_box_error_observer.dart';
 import 'package:streambox_core/src/repo/repo_interface.dart';
 
 /// A base implementation of the [Repo] interface.
@@ -26,10 +27,12 @@ abstract class BaseRepo<P extends RequestParams, E> implements Repo<P, E> {
   /// - [fetchOnInit]: if `true`, initiates a fetch immediately.
   /// - [replayLast]: if `true`, replays the last emitted state to new
   ///   subscribers; otherwise uses a broadcast stream.
+  /// - [tag]: optional identifier for this repository instance.
   BaseRepo({
     P? initialFetchParams,
     bool fetchOnInit = false,
     bool replayLast = false,
+    this.tag,
   }) {
     _streamAdapter = replayLast
         ? BehaviorStreamAdapter<DataState<E>>()
@@ -37,6 +40,9 @@ abstract class BaseRepo<P extends RequestParams, E> implements Repo<P, E> {
 
     if (fetchOnInit) fetch(initialFetchParams);
   }
+
+  /// Optional identifier for this repository.
+  final String? tag;
 
   late final StreamAdapter<DataState<E>> _streamAdapter;
 
@@ -81,9 +87,16 @@ abstract class BaseRepo<P extends RequestParams, E> implements Repo<P, E> {
       _streamAdapter.safeAddMapped(DataSuccess(mapperValue));
 
   /// Emits an error state with the given `error` and optional `stackTrace`.
+  /// Notifies global error observers.
   @protected
-  void handleError(Object error, StackTrace? st) =>
-      _streamAdapter.safeAddMapped(DataError(error, st));
+  void handleError(Object error, StackTrace? st) {
+    _streamAdapter.safeAddMapped(DataError(error, st));
+    StreamBoxErrorObservers.instance.notifyError(
+      tag ?? runtimeType.toString(),
+      error,
+      st,
+    );
+  }
 
   /// Emits an initial (flush) state to the stream.
   @protected

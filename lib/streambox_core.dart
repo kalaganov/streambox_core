@@ -10,6 +10,7 @@ export 'src/common/typedefs.dart';
 export 'src/data_sources/base_data_source.dart';
 export 'src/data_sources/base_external_stream_data_source.dart';
 export 'src/data_sources/data_source_interface.dart';
+export 'src/observer/stream_box_error_observer.dart';
 export 'src/repo/base_repo.dart';
 export 'src/repo/chained_sources_repo.dart';
 export 'src/repo/periodic_repo.dart';
