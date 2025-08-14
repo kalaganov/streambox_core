@@ -34,7 +34,7 @@ with clean abstractions and powerful strategies.
   - Periodic fetch
   - External stream integration
 - **Reactive state management** via `Stream<DataState<T>>`
-- **Strongly typed request payloads**: initial, loading, success, error
+- **Strongly typed request payloads**: loading, success, error, initial
 - **Behavior & Broadcast stream adapters**
 - Easy to extend and integrate with your networking or persistence layer
 
@@ -58,10 +58,10 @@ dependencies:
 
 Represents the state of data flow:
 
-- `DataInitial` — no data yet **or after a flush/reset**
 - `DataLoading` — loading in progress
 - `DataSuccess` — data successfully loaded
 - `DataError` — an error occurred
+- `DataInitial` — The state that indicates a repository's data has been cleared (flushed)
 
 ### Cache Strategies
 
@@ -200,5 +200,37 @@ You can implement:
 - Your own `CacheStrategy`
 - Specialized `DataSource` integrations
 - Custom storage adapters
+
+---
+## 🛠 Global Error Handling
+
+Provides a mechanism for global error observation and handling. You can register an `StreamBoxErrorObserver` to be notified of any errors that occur within your repositories. This is useful for centralized logging, analytics, or displaying toast notifications to the user without needing to handle errors in every single repository subscription.
+
+The `StreamBoxErrorObservers` singleton manager allows you to easily register and unregister observers.
+
+Example
+
+This example shows how to create a custom error observer for logging errors.
+```dart
+final class AnalyticsErrorObserver implements StreamBoxErrorObserver {
+  const AnalyticsErrorObserver();
+
+  @override
+  void onError(String repo, Object error, StackTrace? stackTrace) {
+    // Log the error to your analytics service
+    AnalyticsService.instance.logError(
+      'Repo: $repo',
+      error: error,
+      stackTrace: stackTrace,
+    );
+  }
+}
+
+// Register the observer in your app's main function or DI module
+void main() {
+  StreamBoxErrorObservers.instance.register(const AnalyticsErrorObserver());
+  // ... rest of your app setup
+}
+```
 
 ---

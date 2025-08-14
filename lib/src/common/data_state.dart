@@ -54,7 +54,8 @@ final class DataSuccess<E> extends DataState<E> {
   String toString() => 'DataSuccess<$E>{value: $value}';
 }
 
-/// Indicates the initial state before any data has been loaded.
+/// Indicates that the repository's data has been explicitly cleared
+/// via a flush operation, and no data is currently available.
 final class DataInitial<E> extends DataState<E> {
   /// Creates an initial state.
   const DataInitial();
