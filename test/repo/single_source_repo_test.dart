@@ -4,6 +4,7 @@ import 'package:streambox_core/src/common/data_state.dart';
 import 'package:streambox_core/src/common/request_params.dart';
 import 'package:streambox_core/src/data_sources/base_data_source.dart';
 import 'package:streambox_core/src/data_sources/data_source_interface.dart';
+import 'package:streambox_core/src/observer/stream_box_error_observer.dart';
 import 'package:streambox_core/src/repo/repo_interface.dart';
 import 'package:streambox_core/src/repo/single_source_repo.dart';
 import 'package:streambox_core/src/strategies/impl/no_op_cache_strategy.dart';
@@ -200,6 +201,43 @@ void main() {
 
       expectLater(repo.stream, emitsDone).ignore();
     });
+
+    test('notifies global error observers on fetch error', () async {
+      late DataSource<_MockRequestParams, _Response> source;
+      late Repo<_MockRequestParams, String> repo;
+
+      source = _MockDataSourceFail();
+      repo = _MockRepoImpl(dataSource: source);
+
+      final notified = <Object>[];
+      final observer = _MockErrorObserver(notified);
+      StreamBoxErrorObservers.instance.register(observer);
+
+      final events = <DataState<String>>[];
+      final sub = repo.stream.listen(events.add);
+
+      repo.fetch(const _MockRequestParams('a'));
+      await Future<dynamic>.delayed(Duration.zero);
+
+      expect(events.last, isA<DataError<String>>());
+      expect(notified, contains(_error));
+
+      await sub.cancel();
+      await repo.dispose();
+      StreamBoxErrorObservers.instance.clear();
+    });
+
+    test('register and unregister observers', () {
+      final observer = _MockErrorObserver([]);
+      final instance = StreamBoxErrorObservers.instance..clear();
+      expect(instance.hasObservers, isFalse);
+
+      instance.register(observer);
+      expect(instance.contains(observer), isTrue);
+
+      instance.unregister(observer);
+      expect(instance.contains(observer), isFalse);
+    });
   });
 }
 
@@ -291,4 +329,14 @@ class _MockRequestParams implements RequestParams {
 class _MockNoOpCacheStrategy
     extends NoOpCacheStrategy<_MockRequestParams, _Response> {
   _MockNoOpCacheStrategy();
+}
+
+class _MockErrorObserver implements StreamBoxErrorObserver {
+  _MockErrorObserver(this.notified);
+
+  final List<Object> notified;
+
+  @override
+  void onError(String repo, Object error, StackTrace? stackTrace) =>
+      notified.add(error);
 }
