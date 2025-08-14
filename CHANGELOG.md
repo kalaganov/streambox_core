@@ -1,3 +1,7 @@
+## 1.4.1
+
+- Added a global error handling mechanism
+ 
 ## 1.4.0
 
 - Introduced `shouldSkipCache` to `BaseCacheStrategy` for fine-grained control over cache usage.
