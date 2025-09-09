@@ -1,3 +1,7 @@
+## 1.4.2
+
+- Added skipErrors
+
 ## 1.4.1
 
 - Added a global error handling mechanism
