@@ -20,6 +20,14 @@ import 'package:streambox_core/src/strategies/base/cache_strategy_interface.dart
 /// - [R] – Type of request value.
 abstract class NoOpCacheStrategy<P extends RequestParams, R>
     implements CacheStrategy<P, R> {
+  /// Creates a no-op cache strategy.
+  ///
+  /// - [skipErrors]: when set to `true`, errors will be silently
+  ///   ignored and not emitted to the [stream].
+  NoOpCacheStrategy({bool skipErrors = false}) : _skipErrors = skipErrors;
+
+  final bool _skipErrors;
+
   final _controller = StreamController<RequestPayload<P, R>>.broadcast();
 
   /// A broadcast stream of request payloads representing
@@ -30,6 +38,9 @@ abstract class NoOpCacheStrategy<P extends RequestParams, R>
   /// Executes the request using the provided [fetch] function.
   ///
   /// Always performs a fresh fetch; no caching is applied.
+  ///
+  /// If `skipErrors` is enabled, the error will be ignored and not emitted
+  /// to the [stream].
   @override
   Future<void> request(
     P? params,
@@ -46,6 +57,7 @@ abstract class NoOpCacheStrategy<P extends RequestParams, R>
         ),
       );
     } on Object catch (e, st) {
+      if (_skipErrors) return;
       _controller.safeAdd(
         RequestError(params: params, error: e, stackTrace: st),
       );

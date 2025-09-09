@@ -26,9 +26,15 @@ abstract class BaseCacheStrategy<P extends RequestParams, R>
   /// Creates a cache strategy with the given [cache].
   ///
   /// The [cache] provides the persistence mechanism for storing values.
-  BaseCacheStrategy({required Cache<R> cache}) : _cache = cache;
+  ///
+  /// Set [skipErrors] to `true` to silently ignore errors and prevent them
+  /// from being emitted to the [stream].
+  BaseCacheStrategy({required Cache<R> cache, required bool skipErrors})
+    : _cache = cache,
+      _skipErrors = skipErrors;
 
   final Cache<R> _cache;
+  final bool _skipErrors;
 
   final _requestVersion = RequestVersion();
 
@@ -146,9 +152,13 @@ abstract class BaseCacheStrategy<P extends RequestParams, R>
   }
 
   /// Emits an error state for the given [error] and optional [stackTrace].
+  ///
+  /// If `skipErrors` is enabled, the error will be ignored and not emitted
+  /// to the [stream].
   @protected
   @nonVirtual
   void handleError(P? params, Object error, [StackTrace? stackTrace]) {
+    if (_skipErrors) return;
     _controller.safeAdd(
       RequestError(params: params, error: error, stackTrace: stackTrace),
     );

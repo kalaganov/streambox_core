@@ -21,7 +21,10 @@ import 'package:streambox_core/src/strategies/base/base_cache_strategy.dart';
 abstract class CacheFirstStrategy<P extends RequestParams, R>
     extends BaseCacheStrategy<P, R> {
   /// Creates a [CacheFirstStrategy] with the given [cache].
-  CacheFirstStrategy({required super.cache});
+  ///
+  /// Set [skipErrors] to `true` to silently ignore errors and prevent them
+  /// from being emitted to the [stream].
+  CacheFirstStrategy({required super.cache, super.skipErrors = false});
 
   @override
   Future<void> performRequest(

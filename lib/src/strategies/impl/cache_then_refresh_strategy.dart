@@ -25,7 +25,10 @@ import 'package:streambox_core/src/strategies/base/base_cache_strategy.dart';
 abstract class CacheThenRefreshStrategy<P extends RequestParams, R>
     extends BaseCacheStrategy<P, R> {
   /// Creates a [CacheThenRefreshStrategy] with the given [cache].
-  CacheThenRefreshStrategy({required super.cache});
+  ///
+  /// Set [skipErrors] to `true` to silently ignore errors and prevent them
+  /// from being emitted to the [stream].
+  CacheThenRefreshStrategy({required super.cache, super.skipErrors = false});
 
   @override
   Future<void> performRequest(
