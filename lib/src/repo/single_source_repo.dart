@@ -32,6 +32,7 @@ abstract class SingleSourceRepo<P extends RequestParams, R, E>
     super.initialFetchParams,
     super.fetchOnInit,
     super.replayLast,
+    super.resetOnFlush,
   }) : _dataSource = dataSource {
     final payloadHandler = PayloadHandlerDelegate(
       map: map,

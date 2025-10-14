@@ -39,6 +39,7 @@ abstract class ChainedSourcesRepo<
     super.initialFetchParams,
     super.fetchOnInit,
     super.replayLast,
+    super.resetOnFlush,
   }) : _primarySource = primarySource,
        _dependentSource = dependentSource {
     _primarySourceSubscription = primarySource.stream.listen(_onPrimaryData);
