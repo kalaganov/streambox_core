@@ -1,3 +1,7 @@
+## 1.4.3
+
+- Enhance flush to clear replayed value
+
 ## 1.4.2
 
 - Added skipErrors
