@@ -1,3 +1,7 @@
+## 1.4.4
+
+- Add `resetOnFlush` flag for configurable flush behavior
+
 ## 1.4.3
 
 - Enhance flush to clear replayed value
