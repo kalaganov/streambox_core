@@ -98,9 +98,18 @@ abstract class BaseRepo<P extends RequestParams, E> implements Repo<P, E> {
     );
   }
 
-  /// Emits an initial (flush) state to the stream.
+  /// Emits an initial (flush) state to the stream, and if a
+  /// `BehaviorStreamAdapter` is used, immediately clears this state
+  /// to prevent it from being replayed to new subscribers.
   @protected
-  void handleFlush() => _streamAdapter.safeAddMapped(DataInitial<E>());
+  void handleFlush() {
+    _streamAdapter.safeAddMapped(DataInitial<E>());
+
+    final adapter = _streamAdapter;
+    if (adapter is BehaviorStreamAdapter<DataState<E>>) {
+      adapter.clearLast();
+    }
+  }
 
   /// Returns whether the repository has been disposed.
   @protected

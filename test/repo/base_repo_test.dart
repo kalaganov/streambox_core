@@ -66,6 +66,32 @@ void main() {
       await repo.dispose();
     });
 
+    test(
+      'flush emits DataInitial but not to new ones (with replayLast)',
+      () async {
+        final repo = _TestRepoWithReplay();
+        final events = <DataState<String>>[];
+        final subA = repo.stream.listen(events.add);
+
+        await repo.flush();
+        await Future<void>.delayed(Duration.zero);
+
+        expect(events, hasLength(1));
+        expect(events.last, isA<DataInitial<String>>());
+
+        final secondListenerEvents = <DataState<String>>[];
+        final subB = repo.stream.listen(secondListenerEvents.add);
+
+        await Future<void>.delayed(Duration.zero);
+
+        expect(secondListenerEvents, isEmpty);
+
+        await subA.cancel();
+        await subB.cancel();
+        await repo.dispose();
+      },
+    );
+
     test('stream closes on dispose', () async {
       final repo = _TestRepo();
       final sub = repo.stream.listen(null);

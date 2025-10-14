@@ -39,6 +39,14 @@ final class BehaviorStreamAdapter<T> implements StreamAdapter<T> {
     return proxyController.stream;
   }
 
+  /// Clears the last emitted value.
+  /// New subscribers will not receive any value upon subscription
+  /// until a new event is added.
+  void clearLast() {
+    _last = null;
+    _has = false;
+  }
+
   @override
   bool get isClosed => _closed;
 
