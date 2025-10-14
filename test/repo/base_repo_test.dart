@@ -69,7 +69,7 @@ void main() {
     test(
       'flush emits DataInitial but not to new ones (with replayLast)',
       () async {
-        final repo = _TestRepoWithReplay();
+        final repo = _TestRepoWithReplayAndReset();
         final events = <DataState<String>>[];
         final subA = repo.stream.listen(events.add);
 
@@ -143,6 +143,18 @@ class _TestRepo extends BaseRepo<_MockRequestParams, String> {
 
 class _TestRepoWithReplay extends BaseRepo<_MockRequestParams, String> {
   _TestRepoWithReplay() : super(replayLast: true);
+
+  void emitSuccess(String val) => handleData(val);
+
+  @override
+  Future<void> flush() async => handleFlush();
+
+  @override
+  void fetch([_MockRequestParams? params]) {}
+}
+
+class _TestRepoWithReplayAndReset extends BaseRepo<_MockRequestParams, String> {
+  _TestRepoWithReplayAndReset() : super(replayLast: true, resetOnFlush: true);
 
   void emitSuccess(String val) => handleData(val);
 

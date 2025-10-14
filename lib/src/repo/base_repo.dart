@@ -32,6 +32,7 @@ abstract class BaseRepo<P extends RequestParams, E> implements Repo<P, E> {
     P? initialFetchParams,
     bool fetchOnInit = false,
     bool replayLast = false,
+    this.resetOnFlush = false,
     this.tag,
   }) {
     _streamAdapter = replayLast
@@ -43,6 +44,15 @@ abstract class BaseRepo<P extends RequestParams, E> implements Repo<P, E> {
 
   /// Optional identifier for this repository.
   final String? tag;
+
+  /// Determines whether to clear the `DataInitial` state after a flush.
+  ///
+  /// If `true`, the `DataInitial` state emitted by `flush()` will not be
+  /// replayed to new subscribers when `replayLast` is also true. This is
+  /// useful to prevent a stale "initial" state from being shown.
+  ///
+  /// Defaults to `false`, meaning the `DataInitial` state will be replayed.
+  final bool resetOnFlush;
 
   late final StreamAdapter<DataState<E>> _streamAdapter;
 
@@ -98,16 +108,20 @@ abstract class BaseRepo<P extends RequestParams, E> implements Repo<P, E> {
     );
   }
 
-  /// Emits an initial (flush) state to the stream, and if a
-  /// `BehaviorStreamAdapter` is used, immediately clears this state
-  /// to prevent it from being replayed to new subscribers.
+  /// Emits an initial (flush) state to the stream.
+  ///
+  /// If [resetOnFlush] is true and a `BehaviorStreamAdapter` is used,
+  /// it also clears this state immediately to prevent it from being
+  /// replayed to new subscribers.
   @protected
   void handleFlush() {
     _streamAdapter.safeAddMapped(DataInitial<E>());
 
-    final adapter = _streamAdapter;
-    if (adapter is BehaviorStreamAdapter<DataState<E>>) {
-      adapter.clearLast();
+    if (resetOnFlush) {
+      final adapter = _streamAdapter;
+      if (adapter is BehaviorStreamAdapter<DataState<E>>) {
+        adapter.clearLast();
+      }
     }
   }
 
