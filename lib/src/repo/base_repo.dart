@@ -118,10 +118,26 @@ abstract class BaseRepo<P extends RequestParams, E> implements Repo<P, E> {
     _streamAdapter.safeAddMapped(DataInitial<E>());
 
     if (resetOnFlush) {
-      final adapter = _streamAdapter;
-      if (adapter is BehaviorStreamAdapter<DataState<E>>) {
-        adapter.clearLast();
-      }
+      clearLast();
+    }
+  }
+
+  /// Clears the last replayed [DataState] from the stream.
+  ///
+  /// This method only has an effect if the repository was constructed with
+  /// `replayLast: true`. When called, it removes the cached state from the
+  /// underlying `BehaviorStreamAdapter`, preventing new subscribers from
+  /// receiving it upon listening.
+  ///
+  /// If the repository was constructed with `replayLast: false`, this method
+  /// does nothing.
+  ///
+  /// This is useful for explicitly invalidating the cache, for example, on a
+  /// user logout, to ensure that new listeners do not receive stale data.
+  void clearLast() {
+    final adapter = _streamAdapter;
+    if (adapter is BehaviorStreamAdapter<DataState<E>>) {
+      adapter.clearLast();
     }
   }
 

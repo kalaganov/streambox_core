@@ -124,6 +124,21 @@ void main() {
       await subB.cancel();
       await repo.dispose();
     });
+
+    test('replay last - clearLast', () async {
+      final repo = _TestRepoWithReplay()..emitSuccess('ok');
+      await Future<void>.delayed(Duration.zero);
+
+      repo.clearLast();
+
+      final events = <DataState<String>>[];
+      final sub = repo.stream.listen(events.add);
+
+      expect(events, isEmpty);
+
+      await sub.cancel();
+      await repo.dispose();
+    });
   });
 }
 

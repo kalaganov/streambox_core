@@ -1,3 +1,7 @@
+## 1.4.4+2
+
+- Exposed `clearLast()` as a public method on `BaseRepo` to allow manual invalidation of the replayed state.
+
 ## 1.4.4+1
 
 - add flag to repos
